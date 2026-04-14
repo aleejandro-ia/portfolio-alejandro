@@ -223,23 +223,42 @@ export default function App() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus("sending");
     
-    // Crear enlace mailto con los datos del formulario
-    const subject = encodeURIComponent(`Contacto desde portfolio - ${formData.name}`);
-    const body = encodeURIComponent(`Nombre: ${formData.name}\nEmail: ${formData.email}\n\nMensaje:\n${formData.message}`);
-    window.location.href = `mailto:alejandronopez@gmail.com?subject=${subject}&body=${body}`;
-    
-    setTimeout(() => {
-      setFormStatus("sent");
-      setFormData({ name: "", email: "", message: "" });
-      setTimeout(() => {
-        setShowContactModal(false);
-        setFormStatus("idle");
-      }, 2000);
-    }, 500);
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/alejandronopez@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          _subject: `Nuevo contacto desde portfolio - ${formData.name}`,
+          _captcha: "false",
+        }),
+      });
+
+      if (response.ok) {
+        setFormStatus("sent");
+        setFormData({ name: "", email: "", message: "" });
+        setTimeout(() => {
+          setShowContactModal(false);
+          setFormStatus("idle");
+        }, 3000);
+      } else {
+        setFormStatus("error");
+        setTimeout(() => setFormStatus("idle"), 3000);
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      setFormStatus("error");
+      setTimeout(() => setFormStatus("idle"), 3000);
+    }
   };
 
   const menuItems = [
@@ -629,7 +648,7 @@ export default function App() {
                   </div>
                   <div>
                     <h4 className="font-bold text-white mb-1">Formulario de contacto</h4>
-                    <p className="text-gray-500 text-sm">Rellena y se abrirá tu cliente de email</p>
+                    <p className="text-gray-500 text-sm">Envío directo, te respondo en menos de 24h</p>
                   </div>
                 </div>
 
@@ -642,8 +661,20 @@ export default function App() {
                     <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
                       <Zap className="w-8 h-8 text-accent" />
                     </div>
-                    <p className="text-white font-bold text-xl mb-2">¡Mensaje preparado!</p>
-                    <p className="text-gray-400">Se ha abierto tu cliente de email. Envía y te responderé pronto.</p>
+                    <p className="text-white font-bold text-xl mb-2">¡Mensaje enviado!</p>
+                    <p className="text-gray-400">Te responderé lo antes posible.</p>
+                  </motion.div>
+                ) : formStatus === "error" ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                      <X className="w-8 h-8 text-red-500" />
+                    </div>
+                    <p className="text-white font-bold text-xl mb-2">Error al enviar</p>
+                    <p className="text-gray-400">Inténtalo de nuevo o escríbeme directamente.</p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleFormSubmit} className="space-y-4">
