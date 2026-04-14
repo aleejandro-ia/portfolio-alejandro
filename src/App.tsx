@@ -149,9 +149,15 @@ const parallaxImages = [
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const contactModalRef = useRef<HTMLDivElement>(null);
+
+  // Form state
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const revealVariants = {
     visible: (i: number) => ({
@@ -200,17 +206,47 @@ export default function App() {
       ) {
         setIsMenuOpen(false);
       }
+      if (
+        showContactModal &&
+        contactModalRef.current &&
+        !contactModalRef.current.contains(event.target as Node)
+      ) {
+        setShowContactModal(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
+  }, [isMenuOpen, showContactModal]);
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus("sending");
+    
+    // Crear enlace mailto con los datos del formulario
+    const subject = encodeURIComponent(`Contacto desde portfolio - ${formData.name}`);
+    const body = encodeURIComponent(`Nombre: ${formData.name}\nEmail: ${formData.email}\n\nMensaje:\n${formData.message}`);
+    window.location.href = `mailto:alejandronopez@gmail.com?subject=${subject}&body=${body}`;
+    
+    setTimeout(() => {
+      setFormStatus("sent");
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => {
+        setShowContactModal(false);
+        setFormStatus("idle");
+      }, 2000);
+    }, 500);
+  };
 
   const menuItems = [
     { label: "INICIO", href: "#", highlight: true },
     { label: "SOBRE MÍ", href: "#sobre-mi" },
     { label: "PROYECTOS", href: "#proyectos" },
-    { label: "CONTACTO", href: "#contacto" },
+    { label: "CONTACTO", href: "#contacto", action: () => setShowContactModal(true) },
   ];
 
   return (
@@ -257,7 +293,11 @@ export default function App() {
                     onMouseLeave={(e) => {
                       e.currentTarget.style.color = item.highlight ? "#D4FF00" : "hsl(0 0% 100%)";
                     }}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (item.action) item.action();
+                      setIsMenuOpen(false);
+                    }}
                   >
                     {item.label}
                   </a>
@@ -520,11 +560,177 @@ export default function App() {
             Construyamos algo <br />
             <span className="text-accent italic">más inteligente.</span>
           </h2>
-          <button className="bg-accent text-black px-12 py-6 rounded-full font-bold text-2xl hover:scale-105 transition-transform shadow-xl shadow-accent/20">
+          <button
+            type="button"
+            onClick={() => setShowContactModal(true)}
+            className="bg-accent text-black px-12 py-6 rounded-full font-bold text-2xl hover:scale-105 transition-transform shadow-xl shadow-accent/20"
+          >
             Contactar ahora
           </button>
         </div>
       </section>
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div
+            ref={contactModalRef}
+            className="bg-neutral-900 border border-white/10 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 relative"
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => { setShowContactModal(false); setFormStatus("idle"); setFormData({ name: "", email: "", message: "" }); }}
+              className="absolute top-4 right-4 p-2 text-neutral-500 hover:text-accent transition-colors"
+              aria-label="Cerrar modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Header */}
+            <div className="mb-8">
+              <h3 className="text-3xl md:text-4xl font-bold tracking-tighter mb-2">
+                Hablemos <span className="text-accent">.</span>
+              </h3>
+              <p className="text-gray-400 text-lg">
+                Cuéntame sobre tu proyecto y te responderé en menos de 24 horas.
+              </p>
+            </div>
+
+            {/* Contact Options */}
+            <div className="space-y-8">
+              {/* Option 1: Direct Email */}
+              <div className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:border-accent/30 transition-colors group">
+                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-6 h-6 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-white mb-1">Email directo</h4>
+                  <a
+                    href="mailto:alejandronopez@gmail.com?subject=Contacto%20desde%20portfolio"
+                    className="text-gray-400 text-sm hover:text-accent transition-colors truncate block"
+                  >
+                    alejandronopez@gmail.com
+                  </a>
+                </div>
+                <a
+                  href="mailto:alejandronopez@gmail.com?subject=Contacto%20desde%20portfolio"
+                  className="px-4 py-2 rounded-lg border border-accent/30 text-accent text-sm font-bold hover:bg-accent hover:text-black transition-all flex-shrink-0"
+                >
+                  Enviar
+                </a>
+              </div>
+
+              {/* Option 2: Contact Form */}
+              <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Database className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white mb-1">Formulario de contacto</h4>
+                    <p className="text-gray-500 text-sm">Rellena y se abrirá tu cliente de email</p>
+                  </div>
+                </div>
+
+                {formStatus === "sent" ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+                      <Zap className="w-8 h-8 text-accent" />
+                    </div>
+                    <p className="text-white font-bold text-xl mb-2">¡Mensaje preparado!</p>
+                    <p className="text-gray-400">Se ha abierto tu cliente de email. Envía y te responderé pronto.</p>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleFormSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-bold text-gray-400 mb-2">
+                          Nombre
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleFormChange}
+                          required
+                          placeholder="Tu nombre"
+                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-bold text-gray-400 mb-2">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleFormChange}
+                          required
+                          placeholder="tu@email.com"
+                          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-bold text-gray-400 mb-2">
+                        Mensaje
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleFormChange}
+                        required
+                        rows={4}
+                        placeholder="Cuéntame sobre tu proyecto..."
+                        className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors resize-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={formStatus === "sending"}
+                      className="w-full bg-accent text-black py-3 rounded-lg font-bold text-lg hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {formStatus === "sending" ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
+                          />
+                          Preparando...
+                        </>
+                      ) : (
+                        <>
+                          Enviar mensaje <ArrowRight className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 pt-6 border-t border-white/5 text-center">
+              <p className="text-gray-600 text-sm">
+                También puedes escribirme directamente a{" "}
+                <a href="mailto:alejandronopez@gmail.com" className="text-accent hover:underline">
+                  alejandronopez@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="py-16 px-6 border-t border-white/5 relative z-10">
