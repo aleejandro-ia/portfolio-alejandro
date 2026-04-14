@@ -228,7 +228,7 @@ export default function App() {
     setFormStatus("sending");
     
     try {
-      const response = await fetch("https://formsubmit.co/ajax/alejandronopez@gmail.com", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -238,8 +238,6 @@ export default function App() {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          _subject: `Nuevo contacto desde portfolio - ${formData.name}`,
-          _captcha: "false",
         }),
       });
 
@@ -251,11 +249,13 @@ export default function App() {
           setFormStatus("idle");
         }, 3000);
       } else {
+        const data = await response.json().catch(() => ({}));
+        console.error("Error del servidor:", data.error);
         setFormStatus("error");
         setTimeout(() => setFormStatus("idle"), 3000);
       }
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("Error enviando email:", error);
       setFormStatus("error");
       setTimeout(() => setFormStatus("idle"), 3000);
     }
