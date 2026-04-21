@@ -149,8 +149,8 @@ export default function ChatInterface({
             {/* Header */}
             <div className="w-full max-w-4xl px-8 pt-8 pb-4 z-10 flex flex-col items-center text-center border-b border-[#262E3D] bg-[#181C24]">
               <div className="mb-3">
-                <div className="w-12 h-12 bg-[#8FE331]/10 text-[#8FE331] border border-[#8FE331]/30 flex items-center justify-center rounded-2xl shadow-[0_0_15px_rgba(143,227,49,0.1)]">
-                  <Bot size={24} />
+                <div className="w-12 h-12 bg-[#8FE331]/10 border border-[#8FE331]/30 flex items-center justify-center rounded-2xl shadow-[0_0_15px_rgba(143,227,49,0.1)] overflow-hidden">
+                  <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-8 h-8 object-contain" />
                 </div>
               </div>
               <h2 className="text-xl font-bold text-white mb-1 shadow-sm">
@@ -181,8 +181,8 @@ export default function ChatInterface({
                         m.role === 'user' ? "flex-row-reverse" : "flex-row"
                       )}>
                         {m.role === 'assistant' ? (
-                          <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 text-[#8FE331] flex items-center justify-center border border-[#8FE331]/30 shrink-0">
-                            <Bot size={13} />
+                          <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 flex items-center justify-center border border-[#8FE331]/30 shrink-0 overflow-hidden">
+                            <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-4 h-4 object-contain" />
                           </div>
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
@@ -215,8 +215,8 @@ export default function ChatInterface({
                 {isTyping && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-start px-2 w-full">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 text-[#8FE331] flex items-center justify-center border border-[#8FE331]/30 shrink-0">
-                        <Bot size={13} />
+                      <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 flex items-center justify-center border border-[#8FE331]/30 shrink-0 overflow-hidden">
+                        <img src="/nexus-logo-transparent.png" alt="Nexus Logo" className="w-4 h-4 object-contain" />
                       </div>
                       <span className="text-xs font-semibold text-white">Nexus AI</span>
                     </div>

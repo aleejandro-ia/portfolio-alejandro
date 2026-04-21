@@ -53,7 +53,7 @@ export default function Dashboard({
     <div className="flex flex-1 min-h-0 bg-[#12161E] overflow-hidden text-slate-200 font-sans">
       {/* Narrow sidebar (Nav) */}
       <div className="w-16 bg-[#181C24] border-r border-[#262E3D] flex flex-col items-center py-6 gap-6 z-10 shrink-0">
-         <div className="text-[#8FE331] mb-2"><Package size={28} /></div>
+         <div className="mb-2 flex items-center justify-center"><img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-8 h-8 object-contain" /></div>
          <button className="text-gray-500 hover:text-gray-300 p-2"><Home size={20} /></button>
          <button className="text-gray-500 hover:text-gray-300 p-2"><Clock size={20} /></button>
          <button className="p-2 bg-[#262E3D] text-[#8FE331] rounded-lg shadow-sm"><Grid size={20} /></button>
@@ -333,7 +333,7 @@ export default function Dashboard({
                              ) : (
                                <>
                                  <span className="text-[10px] text-gray-500">Hace {format(m.timestamp, 'HH:mm')}</span>
-                                 <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 text-[#8FE331] flex items-center justify-center shrink-0 border border-[#8FE331]/30"><Bot size={13}/></div>
+                                 <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 flex items-center justify-center shrink-0 border border-[#8FE331]/30 overflow-hidden"><img src="/nexus-logo-transparente.png" alt="Nexus AI" className="w-4 h-4 object-contain" /></div>
                                </>
                              )}
                            </div>
@@ -357,7 +357,7 @@ export default function Dashboard({
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
-            <Package size={48} className="mb-4 opacity-20" />
+            <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-16 h-16 mb-4 opacity-30 object-contain grayscale" />
             <p className="text-sm">Selecciona una incidencia para ver los detalles.</p>
           </div>
         )}

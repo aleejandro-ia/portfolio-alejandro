@@ -6,14 +6,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import {
-  ArrowRight,
-  Linkedin,
-  Github,
   Mail,
   ExternalLink,
   ChevronDown,
   X,
-  Zap,
   Database,
 } from "lucide-react";
 import { ShaderAnimation } from "./components/Animations/ShaderAnimation";
@@ -23,15 +19,14 @@ import { ContactForm } from "./components/Contact/ContactForm";
 import { TimelineContent } from "./components/ui/timeline-animation";
 import { ZoomParallax } from "./components/ui/ZoomParallax";
 import { COLORS, FONTS } from "./constants";
-import { services } from "./data/services";
 import { projects } from "./data/projects";
 import { parallaxImages } from "./data/parallax";
 import { useClickOutside } from "./hooks/useClickOutside";
-import { NexusDemoTrigger, NexusDemoModal } from "./components/NexusDemo";
+import { NexusDemoModal } from "./components/NexusDemo";
 import { ProjectsGallery } from "./components/Projects/ProjectsGallery";
 
-const getContactEmail = () => {
-  return import.meta.env.VITE_CONTACT_EMAIL || "";
+const getPublicContactEmail = () => {
+  return import.meta.env.VITE_PUBLIC_CONTACT_EMAIL || "";
 };
 
 export default function App() {
@@ -39,6 +34,7 @@ export default function App() {
   const [showNexusDemo, setShowNexusDemo] = useState(false);
   const contactModalRef = useClickOutside(() => setShowContactModal(false));
   const aboutRef = useRef<HTMLDivElement>(null);
+  const publicContactEmail = getPublicContactEmail();
 
   const revealVariants = {
     visible: (i: number) => ({
@@ -357,26 +353,28 @@ export default function App() {
             {/* Contact Options */}
             <div className="space-y-8">
               {/* Option 1: Direct Email */}
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:border-accent/30 transition-colors group">
-                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-6 h-6 text-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-white mb-1">Email directo</h4>
+              {publicContactEmail && (
+                <div className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:border-accent/30 transition-colors group">
+                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-6 h-6 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-white mb-1">Email directo</h4>
+                    <a
+                      href={`mailto:${publicContactEmail}?subject=Contacto%20desde%20portfolio`}
+                      className="text-gray-400 text-sm hover:text-accent transition-colors truncate block"
+                    >
+                      {publicContactEmail}
+                    </a>
+                  </div>
                   <a
-                    href={`mailto:${getContactEmail()}?subject=Contacto%20desde%20portfolio`}
-                    className="text-gray-400 text-sm hover:text-accent transition-colors truncate block"
+                    href={`mailto:${publicContactEmail}?subject=Contacto%20desde%20portfolio`}
+                    className="px-4 py-2 rounded-lg border border-accent/30 text-accent text-sm font-bold hover:bg-accent hover:text-black transition-all flex-shrink-0"
                   >
-                    {getContactEmail()}
+                    Enviar
                   </a>
                 </div>
-                <a
-                  href={`mailto:${getContactEmail()}?subject=Contacto%20desde%20portfolio`}
-                  className="px-4 py-2 rounded-lg border border-accent/30 text-accent text-sm font-bold hover:bg-accent hover:text-black transition-all flex-shrink-0"
-                >
-                  Enviar
-                </a>
-              </div>
+              )}
 
               {/* Option 2: Contact Form */}
               <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
@@ -404,15 +402,21 @@ export default function App() {
 
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-white/5 text-center">
-              <p className="text-gray-600 text-sm">
-                También puedes escribirme directamente a{" "}
-                <a
-                  href={`mailto:${getContactEmail()}`}
-                  className="text-accent hover:underline"
-                >
-                  {getContactEmail()}
-                </a>
-              </p>
+              {publicContactEmail ? (
+                <p className="text-gray-600 text-sm">
+                  También puedes escribirme directamente a{" "}
+                  <a
+                    href={`mailto:${publicContactEmail}`}
+                    className="text-accent hover:underline"
+                  >
+                    {publicContactEmail}
+                  </a>
+                </p>
+              ) : (
+                <p className="text-gray-600 text-sm">
+                  El formulario envía tu mensaje sin exponer el correo de destino en el frontend.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -437,12 +441,14 @@ export default function App() {
             >
               Github <ExternalLink className="w-4 h-4" />
             </a>
-            <a
-              href={`mailto:${getContactEmail()}`}
-              className="text-gray-500 hover:text-accent transition-colors flex items-center gap-2 text-sm uppercase tracking-widest font-bold"
-            >
-              Email <ExternalLink className="w-4 h-4" />
-            </a>
+            {publicContactEmail && (
+              <a
+                href={`mailto:${publicContactEmail}`}
+                className="text-gray-500 hover:text-accent transition-colors flex items-center gap-2 text-sm uppercase tracking-widest font-bold"
+              >
+                Email <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
           </div>
           <div className="text-gray-600 text-sm font-mono uppercase">
             © 2024 Alejandro Lopez

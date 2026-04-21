@@ -2,8 +2,6 @@ import { useState, useCallback, type ChangeEvent, type FormEvent } from "react";
 import { ContactFormData, FormStatus } from "../types/forms";
 import { validateContactForm } from "../utils/validation";
 
-const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL || "";
-const FORM_SUBMIT_URL = "https://formsubmit.co/ajax/";
 const TIMEOUT_MS = 10000;
 
 export interface UseContactFormReturn {
@@ -64,7 +62,7 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
         const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
         const response = await fetch(
-          `${FORM_SUBMIT_URL}${CONTACT_EMAIL}`,
+          "/api/contact",
           {
             method: "POST",
             headers: {
@@ -75,8 +73,6 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
               name: formData.name,
               email: formData.email,
               message: formData.message,
-              _subject: `Nuevo contacto desde portfolio - ${formData.name}`,
-              _captcha: "false",
             }),
             signal: controller.signal,
           }
@@ -92,10 +88,26 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
             onSuccess?.();
           }, 2000);
         } else {
+          const errorData = await response.json().catch(() => null);
           setFormStatus("error");
-          setErrors({
-            submit: "Error al enviar el mensaje. Por favor, intenta de nuevo.",
-          });
+          const fieldErrors =
+            errorData?.fieldErrors?.reduce?.(
+              (acc: Record<string, string>, fieldError: { field: string; message: string }) => {
+                acc[fieldError.field] = fieldError.message;
+                return acc;
+              },
+              {}
+            ) || {};
+
+          setErrors(
+            Object.keys(fieldErrors).length > 0
+              ? fieldErrors
+              : {
+                  submit:
+                    errorData?.error ||
+                    "Error al enviar el mensaje. Por favor, intenta de nuevo.",
+                }
+          );
           setTimeout(() => setFormStatus("idle"), 3000);
         }
       } catch (error) {

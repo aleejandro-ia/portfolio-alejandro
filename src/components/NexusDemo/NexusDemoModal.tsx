@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MessageSquare, LayoutDashboard, Cpu, Package } from 'lucide-react';
+import { X, MessageSquare, LayoutDashboard, Cpu } from 'lucide-react';
 import ChatInterface from './ChatInterface';
 import Dashboard from './Dashboard';
 import { StructuredTicket, TriageResponse, Message } from './types';
@@ -231,8 +231,8 @@ export default function NexusDemoModal({ isOpen, onClose }: NexusDemoModalProps)
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#262E3D] bg-[#181C24] relative z-20">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <div className="text-[#8FE331]">
-                    <Package size={24} />
+                  <div className="flex items-center justify-center">
+                    <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-6 h-6 object-contain" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white tracking-wide">Nexus</h3>

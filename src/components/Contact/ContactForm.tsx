@@ -6,8 +6,8 @@ interface ContactFormProps {
   onSuccess?: () => void;
 }
 
-const getContactEmail = () => {
-  return import.meta.env.VITE_CONTACT_EMAIL || "";
+const getPublicContactEmail = () => {
+  return import.meta.env.VITE_PUBLIC_CONTACT_EMAIL || "";
 };
 
 export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
@@ -19,7 +19,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
     handleSubmit,
   } = useContactForm(onSuccess);
 
-  const contactEmail = getContactEmail();
+  const publicContactEmail = getPublicContactEmail();
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col items-center text-sm">
@@ -29,15 +29,21 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
       <h1 className="text-3xl md:text-4xl font-bold py-2 text-center text-white">
         Estemos en contacto.
       </h1>
-      <p className="max-md:text-sm text-gray-500 pb-6 text-center">
-        O simplemente escríbeme a{" "}
-        <a
-          href={`mailto:${contactEmail}`}
-          className="text-accent hover:underline"
-        >
-          {contactEmail}
-        </a>
-      </p>
+      {publicContactEmail ? (
+        <p className="max-md:text-sm text-gray-500 pb-6 text-center">
+          O simplemente escríbeme a{" "}
+          <a
+            href={`mailto:${publicContactEmail}`}
+            className="text-accent hover:underline"
+          >
+            {publicContactEmail}
+          </a>
+        </p>
+      ) : (
+        <p className="max-md:text-sm text-gray-500 pb-6 text-center">
+          Tu mensaje se envía de forma segura desde el formulario.
+        </p>
+      )}
 
       <div className="max-w-96 w-full px-2">
         {/* Name Field */}

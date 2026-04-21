@@ -155,40 +155,52 @@ export function ProjectsGallery({ projects, setShowNexusDemo }: ProjectsGalleryP
               <motion.div
                 key={`${repeatIndex}-${project.id}`}
                 style={{ skewX }}
-                className="w-[85vw] sm:w-[60vw] md:w-[450px] lg:w-[500px] h-[450px] md:h-[600px] flex-shrink-0 group relative rounded-2xl overflow-hidden border border-white/10 bg-white/[0.02] hover:border-accent/40 transition-colors flex flex-col justify-end p-6 md:p-8"
+                className="w-[85vw] sm:w-[60vw] md:w-[450px] lg:w-[500px] h-[450px] md:h-[600px] flex-shrink-0 group relative rounded-2xl overflow-hidden border border-white/10 bg-black hover:border-accent/40 transition-colors flex flex-col justify-end p-6 md:p-8"
               >
-                {/* Image Placeholder or Actual Image */}
+                {/* Background Image */}
                 <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-500 scale-100 group-hover:scale-105 pointer-events-none">
                   <img 
                     src={project.image} 
                     alt={project.title}
                     className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20" />
                 </div>
                 
                 {/* Content Overlay */}
-                <div className="relative z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 will-change-transform">
-                  <p className="text-accent text-xs md:text-sm font-mono font-bold mb-3 tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                    {project.tag}
-                  </p>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 leading-tight">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-400 mb-6 text-sm md:text-base line-clamp-2 md:line-clamp-3">
-                    {project.description}
-                  </p>
+                <div className="relative z-10 h-full flex flex-col justify-end">
                   
-                  <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
-                    {project.demo && (
-                      <NexusDemoTrigger onClick={() => setShowNexusDemo(true)} />
-                    )}
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 text-accent hover:gap-3 transition-all font-bold text-sm"
-                    >
-                      Ver proyecto <ArrowRight className="w-4 h-4" />
-                    </button>
+                  {/* Transparent Logo (Only for Nexus) */}
+                  {project.id === "nexus" && (
+                    <div className="absolute inset-x-0 top-0 bottom-[40%] md:bottom-[35%] flex items-center justify-center opacity-95 group-hover:opacity-100 transition-transform duration-500 group-hover:scale-[1.02] pointer-events-none px-8 pt-8">
+                      <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-full h-full object-contain drop-shadow-2xl max-w-[90%]" />
+                    </div>
+                  )}
+
+                  <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 will-change-transform relative z-20">
+                    <p className="text-accent text-[10px] md:text-xs font-mono font-bold mb-2 tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 uppercase">
+                      {project.tag}
+                    </p>
+                    <h3 className="text-xl md:text-2xl font-extrabold text-white mb-2 md:mb-3 leading-tight drop-shadow-md">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-300 mb-6 text-xs md:text-sm line-clamp-3 md:line-clamp-4">
+                      {project.description}
+                    </p>
+                    
+                    <div className={`flex opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200 mt-2 ${project.id === "nexus" ? "justify-center w-full" : "gap-4"}`}>
+                      {project.demo && (
+                        <NexusDemoTrigger onClick={() => setShowNexusDemo(true)} />
+                      )}
+                      {project.id !== "nexus" && (
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 text-accent hover:gap-3 transition-all font-bold text-sm"
+                        >
+                          Ver proyecto <ArrowRight className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
