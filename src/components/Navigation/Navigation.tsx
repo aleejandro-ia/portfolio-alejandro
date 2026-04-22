@@ -28,21 +28,21 @@ export const Navigation: React.FC<NavigationProps> = ({ items, onItemSelect }) =
         onClick={toggle}
       >
         {isOpen ? (
-          <X className="w-8 h-8 transition-colors duration-300" strokeWidth={2} />
+          <X className="w-6 h-6 sm:w-8 sm:h-8 transition-colors duration-300" strokeWidth={2} />
         ) : (
-          <Menu className="w-8 h-8 transition-colors duration-300" strokeWidth={2} />
+          <Menu className="w-6 h-6 sm:w-8 sm:h-8 transition-colors duration-300" strokeWidth={2} />
         )}
       </button>
 
       {isOpen && (
         <div
-          className="absolute top-full left-0 w-[200px] md:w-[240px] border-none shadow-2xl mt-2 ml-4 p-4 rounded-lg z-[100] bg-black"
+          className="absolute top-full left-[-16px] sm:left-0 w-[100vw] sm:w-[240px] border-none shadow-2xl mt-4 sm:mt-2 sm:ml-4 p-6 sm:p-4 rounded-b-2xl sm:rounded-lg z-[100] bg-black/95 backdrop-blur-md sm:bg-black border-t border-b sm:border border-white/10"
         >
           {items.map((item) => (
             <a
               key={item.label}
               href={item.href || "#"}
-              className="block text-lg md:text-xl font-bold tracking-tight py-1.5 px-2 cursor-pointer transition-colors duration-300"
+              className="block text-xl sm:text-lg md:text-xl font-bold tracking-tight py-4 sm:py-2 px-6 sm:px-3 cursor-pointer transition-colors duration-300"
               style={{
                 color: item.highlight ? COLORS.accent : COLORS.white,
               }}

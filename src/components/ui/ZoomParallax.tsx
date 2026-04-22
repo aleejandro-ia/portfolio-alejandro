@@ -19,6 +19,7 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 		offset: ['start start', 'end end'],
 	});
 
+	// Escalas más suaves para móvil
 	const scale4 = useTransform(scrollYProgress, [0, 1], [1, 4]);
 	const scale5 = useTransform(scrollYProgress, [0, 1], [1, 5]);
 	const scale6 = useTransform(scrollYProgress, [0, 1], [1, 6]);
@@ -29,19 +30,31 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 
 	if (!images || images.length === 0) return null;
 
+	// Posiciones responsive para cada item (mobile-first con sm: para desktop)
+	const positions = [
+		'sm:[&>div]:!h-[20vh] sm:[&>div]:!w-[25vw] [&>div]:!h-[12vh] [&>div]:!w-[45vw]', // 0 Center
+		'sm:[&>div]:!-top-[30vh] sm:[&>div]:!left-[15vw] sm:[&>div]:!h-[20vh] sm:[&>div]:!w-[25vw] [&>div]:!-top-[42vh] [&>div]:!left-[15vw] [&>div]:!h-[12vh] [&>div]:!w-[35vw]', // 1 Top Right
+		'sm:[&>div]:!-top-[25vh] sm:[&>div]:!-left-[25vw] sm:[&>div]:!h-[25vh] sm:[&>div]:!w-[25vw] [&>div]:!-top-[28vh] [&>div]:!-left-[22vw] [&>div]:!h-[14vh] [&>div]:!w-[45vw]', // 2 Top Left
+		'sm:[&>div]:!top-[0vh] sm:[&>div]:!left-[35vw] sm:[&>div]:!h-[20vh] sm:[&>div]:!w-[20vw] [&>div]:!-top-[15vh] [&>div]:!left-[22vw] [&>div]:!h-[12vh] [&>div]:!w-[40vw]', // 3 Mid Right
+		'sm:[&>div]:!top-[5vh] sm:[&>div]:!-left-[35vw] sm:[&>div]:!h-[20vh] sm:[&>div]:!w-[20vw] [&>div]:!top-[15vh] [&>div]:!-left-[22vw] [&>div]:!h-[12vh] [&>div]:!w-[40vw]', // 4 Mid Left
+		'sm:[&>div]:!top-[30vh] sm:[&>div]:!left-[25vw] sm:[&>div]:!h-[25vh] sm:[&>div]:!w-[25vw] [&>div]:!top-[28vh] [&>div]:!left-[22vw] [&>div]:!h-[14vh] [&>div]:!w-[45vw]', // 5 Bot Right
+		'sm:[&>div]:!top-[30vh] sm:[&>div]:!-left-[15vw] sm:[&>div]:!h-[20vh] sm:[&>div]:!w-[20vw] [&>div]:!top-[42vh] [&>div]:!-left-[15vw] [&>div]:!h-[12vh] [&>div]:!w-[35vw]', // 6 Bot Left
+	];
+
 	return (
-		<div ref={container} className="relative h-[300vh] bg-transparent">
+		<div ref={container} className="relative h-[300vh] sm:h-[300vh] bg-transparent">
 			<div className="sticky top-0 h-screen overflow-hidden">
 				{images.map(({ src, alt, text }, index) => {
 					const scale = scales[index % scales.length];
+					const positionClass = positions[index] || '';
 
 					return (
 						<motion.div
 							key={index}
 							style={{ scale }}
-							className={`absolute top-0 flex h-full w-full items-center justify-center ${index === 1 ? '[&>div]:!-top-[30vh] [&>div]:!left-[5vw] [&>div]:!h-[30vh] [&>div]:!w-[35vw]' : ''} ${index === 2 ? '[&>div]:!-top-[10vh] [&>div]:!-left-[25vw] [&>div]:!h-[45vh] [&>div]:!w-[20vw]' : ''} ${index === 3 ? '[&>div]:!left-[27.5vw] [&>div]:!h-[25vh] [&>div]:!w-[25vw]' : ''} ${index === 4 ? '[&>div]:!top-[27.5vh] [&>div]:!left-[5vw] [&>div]:!h-[25vh] [&>div]:!w-[20vw]' : ''} ${index === 5 ? '[&>div]:!top-[27.5vh] [&>div]:!-left-[22.5vw] [&>div]:!h-[25vh] [&>div]:!w-[30vw]' : ''} ${index === 6 ? '[&>div]:!top-[22.5vh] [&>div]:!left-[25vw] [&>div]:!h-[15vh] [&>div]:!w-[15vw]' : ''} `}
+							className={`absolute top-0 flex h-full w-full items-center justify-center ${positionClass}`}
 						>
-							<div className="relative h-[25vh] w-[25vw] overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black flex items-center justify-center p-6 text-center">
+							<div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl bg-black flex items-center justify-center p-3 sm:p-6 text-center">
 								{src ? (
 									<img
 										src={src}
@@ -50,7 +63,7 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 										referrerPolicy="no-referrer"
 									/>
 								) : (
-									<span className="text-accent font-mono font-bold text-xs sm:text-sm md:text-xl lg:text-2xl uppercase tracking-tighter leading-tight">
+									<span className="text-accent font-mono font-bold text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-tighter leading-snug break-words whitespace-normal text-center w-full px-1 sm:px-2">
 										{text}
 									</span>
 								)}

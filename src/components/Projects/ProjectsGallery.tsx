@@ -126,8 +126,8 @@ export function ProjectsGallery({ projects, setShowNexusDemo }: ProjectsGalleryP
   const repeatCount = 4;
 
   return (
-    <div 
-      className="relative w-full overflow-hidden py-10 cursor-grab active:cursor-grabbing"
+    <div
+      className="relative w-full overflow-hidden py-6 sm:py-10 cursor-grab active:cursor-grabbing touch-pan-y"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -143,61 +143,61 @@ export function ProjectsGallery({ projects, setShowNexusDemo }: ProjectsGalleryP
     >
       <motion.div
         ref={containerRef}
-        className="flex gap-6 md:gap-8 w-max items-center"
+        className="flex gap-4 sm:gap-6 md:gap-8 w-max items-center"
         style={{ x: xTransform }}
         onPanStart={handlePanStart}
         onPan={handlePan}
         onPanEnd={handlePanEnd}
       >
         {Array.from({ length: repeatCount }).map((_, repeatIndex) => (
-          <div key={repeatIndex} className="flex gap-6 md:gap-8 items-center shrink-0 pr-6 md:pr-8">
+          <div key={repeatIndex} className="flex gap-4 sm:gap-6 md:gap-8 items-center shrink-0 pr-4 sm:pr-6 md:pr-8">
             {projects.map((project, idx) => (
               <motion.div
                 key={`${repeatIndex}-${project.id}`}
                 style={{ skewX }}
-                className="w-[85vw] sm:w-[60vw] md:w-[450px] lg:w-[500px] h-[450px] md:h-[600px] flex-shrink-0 group relative rounded-2xl overflow-hidden border border-white/10 bg-black hover:border-accent/40 transition-colors flex flex-col justify-end p-6 md:p-8"
+                className="w-[85vw] sm:w-[75vw] md:w-[450px] lg:w-[500px] h-[400px] sm:h-[500px] md:h-[600px] flex-shrink-0 group relative rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-black hover:border-accent/40 transition-colors flex flex-col justify-end p-4 sm:p-6 md:p-8"
               >
                 {/* Background Image */}
-                <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-500 scale-100 group-hover:scale-105 pointer-events-none">
+                <div className="absolute inset-0 opacity-60 lg:opacity-40 lg:group-hover:opacity-60 transition-opacity duration-500 scale-105 lg:scale-100 lg:group-hover:scale-105 pointer-events-none">
                   <img 
                     src={project.image} 
                     alt={project.title}
-                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" 
+                    className="w-full h-full object-cover filter grayscale-0 lg:grayscale lg:group-hover:grayscale-0 transition-all duration-700" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/20" />
                 </div>
                 
                 {/* Content Overlay */}
                 <div className="relative z-10 h-full flex flex-col justify-end">
-                  
+
                   {/* Transparent Logo (Only for Nexus) */}
                   {project.id === "nexus" && (
-                    <div className="absolute inset-x-0 top-0 bottom-[40%] md:bottom-[35%] flex items-center justify-center opacity-95 group-hover:opacity-100 transition-transform duration-500 group-hover:scale-[1.02] pointer-events-none px-8 pt-8">
+                    <div className="absolute inset-x-0 top-0 bottom-[40%] sm:bottom-[38%] md:bottom-[35%] flex items-center justify-center opacity-100 lg:opacity-95 lg:group-hover:opacity-100 transition-transform duration-500 scale-[1.02] lg:scale-100 lg:group-hover:scale-[1.02] pointer-events-none px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8">
                       <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-full h-full object-contain drop-shadow-2xl max-w-[90%]" />
                     </div>
                   )}
 
-                  <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500 will-change-transform relative z-20">
-                    <p className="text-accent text-[10px] md:text-xs font-mono font-bold mb-2 tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 uppercase">
+                  <div className="translate-y-0 lg:translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-500 will-change-transform relative z-20">
+                    <p className="text-accent text-[9px] sm:text-[10px] md:text-xs font-mono font-bold mb-1 sm:mb-2 tracking-wide opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-500 delay-100 uppercase">
                       {project.tag}
                     </p>
-                    <h3 className="text-xl md:text-2xl font-extrabold text-white mb-2 md:mb-3 leading-tight drop-shadow-md">
+                    <h3 className="text-base sm:text-xl md:text-2xl font-extrabold text-white mb-1 sm:mb-2 md:mb-3 leading-tight drop-shadow-md">
                       {project.title}
                     </h3>
-                    <p className="text-gray-300 mb-6 text-xs md:text-sm line-clamp-3 md:line-clamp-4">
+                    <p className="text-gray-300 mb-4 sm:mb-6 text-[10px] sm:text-xs md:text-sm line-clamp-3 md:line-clamp-4">
                       {project.description}
                     </p>
-                    
-                    <div className={`flex opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200 mt-2 ${project.id === "nexus" ? "justify-center w-full" : "gap-4"}`}>
+
+                    <div className={`flex opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-500 delay-200 mt-1 sm:mt-2 ${project.id === "nexus" ? "justify-center w-full" : "gap-2 sm:gap-4"}`}>
                       {project.demo && (
                         <NexusDemoTrigger onClick={() => setShowNexusDemo(true)} />
                       )}
                       {project.id !== "nexus" && (
                         <button
                           type="button"
-                          className="flex items-center gap-2 text-accent hover:gap-3 transition-all font-bold text-sm"
+                          className="flex items-center gap-1 sm:gap-2 text-accent hover:gap-2 sm:hover:gap-3 transition-all font-bold text-[10px] sm:text-sm"
                         >
-                          Ver proyecto <ArrowRight className="w-4 h-4" />
+                          Ver proyecto <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                       )}
                     </div>

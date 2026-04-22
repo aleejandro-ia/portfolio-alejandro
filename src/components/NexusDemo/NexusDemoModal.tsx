@@ -225,46 +225,48 @@ export default function NexusDemoModal({ isOpen, onClose }: NexusDemoModalProps)
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-2 md:inset-4 bg-[#12161E] border border-[#262E3D] rounded-xl z-50 flex flex-col overflow-hidden shadow-2xl font-sans"
+            className="fixed inset-0 sm:inset-2 md:inset-4 bg-[#12161E] border sm:border-[#262E3D] rounded-none sm:rounded-xl z-50 flex flex-col overflow-hidden shadow-2xl font-sans"
           >
             {/* Header con navegación (Rediseñado) */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#262E3D] bg-[#181C24] relative z-20">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-[#262E3D] bg-[#181C24] relative z-20">
+              <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <div className="flex items-center justify-center">
-                    <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-6 h-6 object-contain" />
+                    <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white tracking-wide">Nexus</h3>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest font-medium">Claims System</p>
+                    <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">Nexus</h3>
+                    <p className="text-[8px] sm:text-[10px] text-gray-500 uppercase tracking-widest font-medium hidden xs:block">Claims System</p>
                   </div>
                 </div>
 
-                {/* Navegación Cliente/Agente */}
-                <nav className="flex items-center gap-1 ml-6 bg-[#11141A] p-1 rounded-lg border border-[#262E3D]">
+                {/* Navegación Cliente/Agente - Scrollable en móvil */}
+                <nav className="flex items-center gap-1 ml-2 sm:ml-6 bg-[#11141A] p-0.5 sm:p-1 rounded-md sm:rounded-lg border border-[#262E3D] overflow-x-auto">
                   <button
                     onClick={() => setView('customer')}
                     className={cn(
-                      "px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 rounded-md",
-                      view === 'customer' 
-                        ? "bg-[#262E3D] text-[#8FE331] shadow-sm" 
+                      "px-2 sm:px-4 py-1.5 text-[9px] sm:text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1 sm:gap-2 rounded-md whitespace-nowrap",
+                      view === 'customer'
+                        ? "bg-[#262E3D] text-[#8FE331] shadow-sm"
                         : "text-gray-500 hover:text-gray-300 hover:bg-[#1C222B]"
                     )}
                   >
-                    <MessageSquare size={14} />
-                    Simular Cliente
+                    <MessageSquare size={12} className="sm:w-4 sm:h-4" />
+                    <span className="hidden xs:inline">Simular Cliente</span>
+                    <span className="xs:hidden">Cliente</span>
                   </button>
                   <button
                     onClick={() => setView('agent')}
                     className={cn(
-                      "px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 rounded-md",
-                      view === 'agent' 
-                        ? "bg-[#262E3D] text-[#8FE331] shadow-sm" 
+                      "px-2 sm:px-4 py-1.5 text-[9px] sm:text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-1 sm:gap-2 rounded-md whitespace-nowrap",
+                      view === 'agent'
+                        ? "bg-[#262E3D] text-[#8FE331] shadow-sm"
                         : "text-gray-500 hover:text-gray-300 hover:bg-[#1C222B]"
                     )}
                   >
-                    <LayoutDashboard size={14} />
-                    Panel Agente
+                    <LayoutDashboard size={12} className="sm:w-4 sm:h-4" />
+                    <span className="hidden xs:inline">Panel Agente</span>
+                    <span className="xs:hidden">Agente</span>
                     {agentSelectedTicketId && view !== 'agent' && tickets.find(t => t.id === agentSelectedTicketId)?.status === 'unresolved' && (
                       <span className="w-1.5 h-1.5 bg-[#8FE331] rounded-full animate-ping ml-1" />
                     )}
@@ -272,19 +274,19 @@ export default function NexusDemoModal({ isOpen, onClose }: NexusDemoModalProps)
                 </nav>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="h-8 px-4 text-[10px] font-bold uppercase tracking-wider border-[#262E3D] bg-transparent text-gray-400 hover:text-white hover:border-[#8FE331] hover:bg-[#8FE331]/10 rounded-md"
+                  className="h-7 sm:h-8 px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border-[#262E3D] bg-transparent text-gray-400 hover:text-white hover:border-[#8FE331] hover:bg-[#8FE331]/10 rounded-md hidden xs:flex"
                 >
-                  Reset Demo
+                  Reset
                 </Button>
                 <button
                   onClick={onClose}
-                  className="text-gray-500 hover:text-white transition-colors p-2 bg-[#1C222B] hover:bg-[#262E3D] rounded-full"
+                  className="text-gray-500 hover:text-white transition-colors p-1.5 sm:p-2 bg-[#1C222B] hover:bg-[#262E3D] rounded-full"
                 >
-                  <X size={16} />
+                  <X size={14} className="sm:w-6 sm:h-6" />
                 </button>
               </div>
             </div>

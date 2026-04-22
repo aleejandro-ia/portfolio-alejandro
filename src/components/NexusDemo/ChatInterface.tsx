@@ -286,7 +286,7 @@ export default function ChatInterface({
             animate={{ opacity: 1 }}
             className="flex-1 min-h-0 w-full flex flex-col items-center bg-[#12161E] overflow-hidden justify-center"
           >
-            <div className="w-full max-w-2xl bg-[#181C24] border border-[#262E3D] rounded-3xl p-10 shadow-2xl">
+            <div className="w-full max-w-2xl bg-[#181C24] border border-[#262E3D] rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xl">
               <div className="text-center space-y-4 mb-8">
                 <div className="inline-flex bg-[#8FE331]/10 text-[#8FE331] p-5 rounded-full mb-2 ring-1 ring-[#8FE331]/30 shadow-[0_0_25px_rgba(143,227,49,0.15)]">
                   <CheckCircle2 size={36} />
@@ -295,8 +295,8 @@ export default function ChatInterface({
                 <p className="text-sm text-gray-400">Nuestro equipo ha recibido tu solicitud exitosamente y será asignada a un agente.</p>
               </div>
 
-              <div className="bg-[#12161E] rounded-2xl p-7 border border-[#262E3D] mb-8">
-                <div className="grid grid-cols-2 gap-y-6 gap-x-6">
+              <div className="bg-[#12161E] rounded-xl sm:rounded-2xl p-4 sm:p-7 border border-[#262E3D] mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 sm:gap-y-6 gap-x-6">
                   <div>
                     <span className="text-[11px] font-bold text-gray-500 tracking-wider uppercase block mb-1.5">ID Ticket</span>
                     <span className="text-white font-mono font-semibold text-base">{finalTicket?.id}</span>

@@ -52,7 +52,7 @@ export default function Dashboard({
   return (
     <div className="flex flex-1 min-h-0 bg-[#12161E] overflow-hidden text-slate-200 font-sans">
       {/* Narrow sidebar (Nav) */}
-      <div className="w-16 bg-[#181C24] border-r border-[#262E3D] flex flex-col items-center py-6 gap-6 z-10 shrink-0">
+      <div className="hidden md:flex w-16 bg-[#181C24] border-r border-[#262E3D] flex-col items-center py-6 gap-6 z-10 shrink-0">
          <div className="mb-2 flex items-center justify-center"><img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-8 h-8 object-contain" /></div>
          <button className="text-gray-500 hover:text-gray-300 p-2"><Home size={20} /></button>
          <button className="text-gray-500 hover:text-gray-300 p-2"><Clock size={20} /></button>
@@ -66,7 +66,7 @@ export default function Dashboard({
       </div>
 
       {/* Sidebar: Lista de Tickets */}
-      <div className="w-[340px] border-r border-[#262E3D] bg-[#181C24] flex flex-col min-h-0 shrink-0">
+      <div className={cn("w-full md:w-[340px] border-r border-[#262E3D] bg-[#181C24] flex-col min-h-0 shrink-0", selectedId ? "hidden md:flex" : "flex")}>
         <div className="px-5 py-6 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white tracking-wide">
             Claims Agent
@@ -150,14 +150,19 @@ export default function Dashboard({
       </div>
 
       {/* Main Detail View */}
-      <div className="flex-1 flex flex-col h-full bg-[#12161E] relative min-w-0">
+      <div className={cn("flex-1 flex-col h-full bg-[#12161E] relative min-w-0", selectedId ? "flex" : "hidden md:flex")}>
         {selectedTicket ? (
-          <div className="flex-1 overflow-hidden grid grid-cols-[1fr_360px] min-h-0">
+          <div className="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col lg:grid lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px] min-h-0">
             {/* Center Content */}
             <div className="flex flex-col h-full overflow-hidden">
                {/* Header / Topbar */}
-               <div className="h-16 border-b border-[#262E3D] flex items-center justify-between px-8 bg-[#181C24]">
-                 <h1 className="text-lg font-semibold text-white">Dashboard</h1>
+               <div className="h-16 border-b border-[#262E3D] flex items-center justify-between px-4 sm:px-8 bg-[#181C24] shrink-0">
+                 <div className="flex items-center gap-3">
+                   <button onClick={() => setSelectedId(null)} className="md:hidden text-gray-500 hover:text-white flex items-center justify-center p-1">
+                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+                   </button>
+                   <h1 className="text-base sm:text-lg font-semibold text-white">Dashboard</h1>
+                 </div>
                  <div className="flex items-center gap-4">
                    <button className="text-gray-500 hover:text-white relative">
                      <MessageSquare size={18} />
@@ -168,11 +173,11 @@ export default function Dashboard({
                  </div>
                </div>
 
-               <ScrollArea className="flex-1 p-8">
+               <ScrollArea className="flex-1 p-4 sm:p-8">
                  <div className="max-w-4xl space-y-6">
-                   <div className="flex items-center justify-between mb-4">
-                     <h2 className="text-lg font-semibold text-white flex items-center gap-2 uppercase tracking-wide">
-                       DETALLES DE LA INCIDENCIA: <span className="text-[#8FE331]">{selectedTicket.id}</span>
+                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                     <h2 className="text-sm sm:text-lg font-semibold text-white flex flex-wrap items-center gap-1 sm:gap-2 uppercase tracking-wide">
+                       DETALLES DE LA INCIDENCIA: <span className="text-[#8FE331] break-all">{selectedTicket.id}</span>
                      </h2>
                      <button className="flex items-center gap-2 px-3 py-1.5 bg-[#1C222B] border border-[#2A3441] rounded-md text-xs font-medium text-gray-300 hover:bg-[#2A3441] transition-colors">
                        <FileText size={14} />
@@ -182,7 +187,7 @@ export default function Dashboard({
                    </div>
 
                    {/* Grid 3 cards (Identificación, Categoría, Estado) */}
-                   <div className="grid grid-cols-3 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                      <div className="bg-[#1C222B] border border-[#2A3441] rounded-xl p-5 shadow-sm">
                        <h4 className="text-[11px] font-bold text-gray-400 tracking-wider mb-4 flex items-center gap-2">
                          <User size={14}/> IDENTIFICACIÓN
@@ -224,7 +229,7 @@ export default function Dashboard({
                    </div>
 
                    {/* Items / Incidencias identificadas */}
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                      <div className="bg-[#1C222B] border border-[#2A3441] rounded-xl p-5 shadow-sm items-start content-start">
                        <h4 className="text-[11px] font-bold text-gray-400 tracking-wider mb-4 flex items-center gap-2">
                          <Package size={14}/> ITEMS RELACIONADOS
@@ -260,7 +265,7 @@ export default function Dashboard({
                    </div>
 
                    {/* Resumen & Missing Info */}
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                      <div className="bg-[#1C222B] border border-[#2A3441] rounded-xl p-5 shadow-sm">
                        <h4 className="text-[11px] font-bold text-gray-400 tracking-wider mb-3 flex items-center gap-2">
                          <FileText size={14}/> RESOLUCIÓN PROPUESTA
@@ -310,7 +315,7 @@ export default function Dashboard({
             </div>
 
             {/* Right Sidebar (Historial) */}
-            <div className="bg-[#181C24] border-l border-[#262E3D] flex flex-col min-h-0 shrink-0 shadow-lg z-10 w-[360px]">
+            <div className="bg-[#181C24] border-t lg:border-t-0 lg:border-l border-[#262E3D] flex flex-col min-h-[350px] lg:min-h-0 shrink-0 shadow-lg z-10 w-full lg:w-[320px] xl:w-[360px]">
                <div className="h-16 border-b border-[#262E3D] flex items-center px-6 justify-between bg-[#181C24]">
                  <h3 className="text-xs font-semibold text-white tracking-wide">HISTORIAL DE CONVERSACIÓN</h3>
                  <button className="text-gray-500 hover:text-white pb-2 font-bold tracking-widest">...</button>

@@ -28,23 +28,6 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    const textureLoader = new THREE.TextureLoader();
-    const logoTexture = textureLoader.load("/logo-portfolio.png", (tex) => {
-      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      tex.colorSpace = THREE.SRGBColorSpace;
-      // Mejor calidad para reescalado (mipmaps)
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.generateMipmaps = true;
-
-      // Ajuste dinámico de proporción para que NO se estire
-      const aspect = tex.image.width / tex.image.height;
-      const baseHeight = isMobile ? 1.8 : 2.5; // Tamaño más elegante y menos "gigante"
-      logoMesh.scale.set(baseHeight * aspect, baseHeight, 1);
-      
-      tex.needsUpdate = true;
-    });
-
     // ... (rest of the setup)
     
     // 1. The Living Neural Core (Sphere with high-end organic shader)
@@ -239,17 +222,6 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
     const linesMesh = new THREE.LineSegments(linesGeo, linesMat);
     scene.add(linesMesh);
 
-    // 3. Logo Reveal
-    const logoGeometry = new THREE.PlaneGeometry(3.5, 3.5);
-    const logoMaterial = new THREE.MeshBasicMaterial({
-      map: logoTexture,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-    });
-    const logoMesh = new THREE.Mesh(logoGeometry, logoMaterial);
-    logoMesh.position.z = -0.2;
-    scene.add(logoMesh);
 
     const onWindowResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -264,8 +236,7 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
 
     // Timeline constants
     const TIME_EXPLODE = 2.0;
-    const TIME_LOGO = 2.3;
-    const TIME_ZOOM = 4.2;
+    const TIME_ZOOM = 2.2;
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
@@ -312,7 +283,7 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
           velocities[idx+2] *= 0.95;
           
           // Slight attraction to center (reforming energy)
-          if (elapsedTime > TIME_LOGO) {
+          if (elapsedTime > TIME_EXPLODE + 0.5) {
             velocities[idx] += (0 - posArray[idx]) * 0.001;
             velocities[idx+1] += (0 - posArray[idx+1]) * 0.001;
           }
@@ -340,24 +311,17 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
         linePosAttr.needsUpdate = true;
       }
 
-      // Phase 3: Logo Reveal
-      if (elapsedTime > TIME_LOGO) {
-        const revealT = Math.min((elapsedTime - TIME_LOGO) / 1.0, 1.0);
-        logoMaterial.opacity = revealT;
-        logoMesh.position.y = Math.sin(elapsedTime * 1.2) * 0.1;
-        logoMesh.scale.setScalar(0.95 + revealT * 0.05);
-      }
 
       // Phase 4: Cinematic zoom
       if (elapsedTime > TIME_ZOOM) {
-        const zoomT = Math.min((elapsedTime - TIME_ZOOM) / 1.0, 1.0);
+        const zoomT = Math.min((elapsedTime - TIME_ZOOM) / 0.8, 1.0);
         const easeZoom = Math.pow(zoomT, 6);
         camera.position.z = 5 - easeZoom * 8.0;
         
-        if (zoomT > 0.5 && !hasTriggeredComplete) {
+        if (zoomT >= 1.0 && !hasTriggeredComplete) {
           hasTriggeredComplete = true;
           setIsFadingOut(true);
-          setTimeout(onComplete, 800);
+          setTimeout(onComplete, 0);
         }
       }
 
@@ -373,13 +337,10 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
       renderer.dispose();
       sphereGeometry.dispose();
       sphereMaterial.dispose();
-      logoGeometry.dispose();
-      logoMaterial.dispose();
       particlesGeo.dispose();
       particlesMat.dispose();
       linesGeo.dispose();
       linesMat.dispose();
-      logoTexture.dispose();
     };
   }, [onComplete]);
 
