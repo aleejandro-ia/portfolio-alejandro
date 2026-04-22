@@ -1,8 +1,8 @@
-import { useState, useCallback, type ChangeEvent, type FormEvent } from "react";
+import { useState, useCallback, useRef, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { ContactFormData, FormStatus } from "../types/forms";
 import { validateContactForm } from "../utils/validation";
 
-const TIMEOUT_MS = 10000;
+const TIMEOUT_MS = 15000;
 
 export interface UseContactFormReturn {
   formData: ContactFormData;
@@ -22,6 +22,14 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
 
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,10 +65,10 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
       setFormStatus("sending");
       setErrors({});
 
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+      try {
         const response = await fetch(
           "/api/contact",
           {
@@ -78,55 +86,74 @@ export function useContactForm(onSuccess?: () => void): UseContactFormReturn {
           }
         );
 
-        clearTimeout(timeout);
+        clearTimeout(timeoutId);
+
+        if (!isMounted.current) return;
 
         if (response.ok) {
           setFormStatus("sent");
           setFormData({ name: "", email: "", message: "" });
+          
+          // Trigger success callback after showing "Sent" status for a bit
           setTimeout(() => {
-            setFormStatus("idle");
-            onSuccess?.();
+            if (isMounted.current) {
+              onSuccess?.();
+              // Give some time for the modal to start closing before resetting to idle
+              setTimeout(() => {
+                if (isMounted.current) setFormStatus("idle");
+              }, 500);
+            }
           }, 2000);
         } else {
-          const errorData = await response.json().catch(() => null);
-          setFormStatus("error");
-          const fieldErrors =
-            errorData?.fieldErrors?.reduce?.(
-              (acc: Record<string, string>, fieldError: { field: string; message: string }) => {
-                acc[fieldError.field] = fieldError.message;
-                return acc;
-              },
-              {}
-            ) || {};
+          let errorMessage = "Error al enviar el mensaje. Por favor, intenta de nuevo.";
+          let fieldErrors: Record<string, string> = {};
 
+          try {
+            const errorData = await response.json();
+            if (errorData?.fieldErrors && Array.isArray(errorData.fieldErrors)) {
+              errorData.fieldErrors.forEach((fe: { field: string; message: string }) => {
+                fieldErrors[fe.field] = fe.message;
+              });
+            } else if (errorData?.error) {
+              errorMessage = errorData.error;
+            }
+          } catch (e) {
+            // If JSON parsing fails, we already have a default errorMessage
+            console.error("Could not parse error response:", e);
+          }
+
+          setFormStatus("error");
           setErrors(
             Object.keys(fieldErrors).length > 0
               ? fieldErrors
-              : {
-                  submit:
-                    errorData?.error ||
-                    "Error al enviar el mensaje. Por favor, intenta de nuevo.",
-                }
+              : { submit: errorMessage }
           );
-          setTimeout(() => setFormStatus("idle"), 3000);
+          
+          setTimeout(() => {
+            if (isMounted.current) setFormStatus("idle");
+          }, 4000);
         }
       } catch (error) {
+        clearTimeout(timeoutId);
         console.error("Error sending contact form:", error);
 
+        if (!isMounted.current) return;
+
+        setFormStatus("error");
+        
         if (error instanceof Error && error.name === "AbortError") {
           setErrors({
-            submit:
-              "La solicitud tardó demasiado. Por favor, intenta de nuevo.",
+            submit: "La solicitud tardó demasiado. Por favor, comprueba tu conexión e intenta de nuevo.",
           });
         } else {
           setErrors({
-            submit:
-              "Error de conexión. Por favor, intenta de nuevo o envía un email directamente.",
+            submit: "Error de conexión. Por favor, intenta de nuevo o envía un email directamente.",
           });
         }
 
-        setFormStatus("error");
-        setTimeout(() => setFormStatus("idle"), 3000);
+        setTimeout(() => {
+          if (isMounted.current) setFormStatus("idle");
+        }, 4000);
       }
     },
     [formData, onSuccess]

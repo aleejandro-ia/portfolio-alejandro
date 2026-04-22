@@ -64,8 +64,9 @@ export function ShaderAnimation() {
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
       renderer.setClearColor(0x000000, 1);
 
       container.appendChild(renderer.domElement);
@@ -81,10 +82,13 @@ export function ShaderAnimation() {
           const width = container.clientWidth;
           const height = container.clientHeight;
           renderer!.setSize(width, height);
-          uniforms.resolution.value.x =
-            width * renderer!.getPixelRatio();
-          uniforms.resolution.value.y =
-            height * renderer!.getPixelRatio();
+          
+          const pixelRatio = renderer!.getPixelRatio();
+          // Lower resolution multiplier for mobile to save GPU
+          const resMultiplier = isMobile ? 0.5 : 1.0;
+          
+          uniforms.resolution.value.x = width * pixelRatio * resMultiplier;
+          uniforms.resolution.value.y = height * pixelRatio * resMultiplier;
         }, 150);
       };
 

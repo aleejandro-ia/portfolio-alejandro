@@ -12,6 +12,7 @@ import {
   X,
   Database,
 } from "lucide-react";
+import { IntroAnimation } from "./components/Animations/IntroAnimation";
 import { ShaderAnimation } from "./components/Animations/ShaderAnimation";
 import { BlurText } from "./components/Hero/BlurText";
 import { Navigation } from "./components/Navigation/Navigation";
@@ -30,6 +31,7 @@ const getPublicContactEmail = () => {
 };
 
 export default function App() {
+  const [introComplete, setIntroComplete] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showNexusDemo, setShowNexusDemo] = useState(false);
   const contactModalRef = useClickOutside(() => setShowContactModal(false));
@@ -84,10 +86,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen selection:bg-accent selection:text-black transition-colors relative bg-transparent text-white">
-      <ShaderAnimation />
+      {!introComplete && <IntroAnimation onComplete={() => setIntroComplete(true)} />}
+      
+      {introComplete && <ShaderAnimation />}
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6">
+      <header className={`fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-opacity duration-1000 ${introComplete ? 'opacity-100' : 'opacity-0'}`}>
         <nav className="flex items-center justify-between max-w-screen-2xl mx-auto">
           <Navigation items={menuItems} />
           <div className="text-4xl font-bold tracking-tighter text-white">AL</div>
@@ -96,16 +100,37 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <main className="relative min-h-screen flex flex-col">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4">
-          <div className="relative text-center">
+      <main className={`relative min-h-screen flex flex-col transition-opacity duration-1000 ${introComplete ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 flex items-center justify-center">
+          
+          {/* Ghost Logo */}
+          {introComplete && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 0.15, scale: 1, y: [0, -15, 0] }}
+              transition={{
+                opacity: { duration: 3, ease: "easeOut" },
+                scale: { duration: 3, ease: "easeOut" },
+                y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+              }}
+              className="absolute w-[300px] md:w-[500px] lg:w-[600px] pointer-events-none z-0 mix-blend-screen"
+            >
+              <img 
+                src="/logo-portfolio.png" 
+                alt="Alejandro Lopez Logo" 
+                className="w-full h-full object-contain filter blur-[4px]" 
+              />
+            </motion.div>
+          )}
+
+          <div className="relative text-center z-10">
             <div className="flex flex-col items-center">
               <BlurText
                 text="ALEJANDRO"
                 delay={100}
                 animateBy="letters"
                 direction="top"
-                className="font-bold text-[60px] sm:text-[100px] md:text-[140px] lg:text-[180px] leading-[0.75] tracking-tighter uppercase justify-center whitespace-nowrap"
+                className="font-bold text-[48px] sm:text-[100px] md:text-[140px] lg:text-[180px] leading-[0.75] tracking-tighter uppercase justify-center whitespace-nowrap"
                 style={{
                   color: COLORS.accent,
                   fontFamily: FONTS.code,
@@ -116,7 +141,7 @@ export default function App() {
                 delay={100}
                 animateBy="letters"
                 direction="top"
-                className="font-bold text-[60px] sm:text-[100px] md:text-[140px] lg:text-[180px] leading-[0.75] tracking-tighter uppercase justify-center whitespace-nowrap"
+                className="font-bold text-[48px] sm:text-[100px] md:text-[140px] lg:text-[180px] leading-[0.75] tracking-tighter uppercase justify-center whitespace-nowrap"
                 style={{
                   color: COLORS.accent,
                   fontFamily: FONTS.code,
@@ -298,6 +323,9 @@ export default function App() {
           <h2 className="text-3xl md:text-5xl font-bold text-white text-center tracking-tight">
             Proyectos destacados
           </h2>
+          <p className="text-xl md:text-2xl font-bold text-white/60 text-center tracking-tight mt-4">
+            ¿Qué podemos hacer en tu empresa?
+          </p>
         </div>
         
         <ProjectsGallery projects={projects} setShowNexusDemo={setShowNexusDemo} />

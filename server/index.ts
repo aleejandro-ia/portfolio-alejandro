@@ -153,64 +153,60 @@ app.post("/api/triage", triageLimiter, async (req, res) => {
 });
 
 app.post("/api/contact", contactLimiter, async (req, res) => {
-  const contactEmail = getEnvValue("CONTACT_EMAIL", "VITE_PUBLIC_CONTACT_EMAIL");
-  const { name = "", email = "", message = "", website = "" } = req.body as Record<string, string>;
-
-  res.setHeader("Cache-Control", "no-store");
-
-  if (!contactEmail) {
-    res.status(503).json({
-      error: "El formulario de contacto no está configurado en el servidor.",
-    });
-    return;
-  }
-
-  if (typeof website === "string" && website.trim().length > 0) {
-    res.status(200).json({ ok: true });
-    return;
-  }
-
-  const validation = validateContactForm({
-    name: String(name),
-    email: String(email),
-    message: String(message),
-  });
-
-  if (!validation.valid) {
-    res.status(400).json({
-      error: "Los datos del formulario no son válidos.",
-      fieldErrors: validation.errors || [],
-    });
-    return;
-  }
-
   try {
+    const contactEmail = getEnvValue("CONTACT_EMAIL", "VITE_PUBLIC_CONTACT_EMAIL");
+    const { name = "", email = "", message = "", website = "" } = req.body as Record<string, string>;
+
+    res.setHeader("Cache-Control", "no-store");
+
+    if (!contactEmail) {
+      return res.status(503).json({
+        error: "El servicio de contacto no está disponible temporalmente.",
+      });
+    }
+
+    // Simple Honeypot check
+    if (typeof website === "string" && website.trim().length > 0) {
+      return res.status(200).json({ ok: true });
+    }
+
+    const validation = validateContactForm({
+      name: String(name),
+      email: String(email),
+      message: String(message),
+    });
+
+    if (!validation.valid) {
+      return res.status(400).json({
+        error: "Los datos del formulario no son válidos.",
+        fieldErrors: validation.errors || [],
+      });
+    }
+
     const response = await fetch(`https://formsubmit.co/ajax/${contactEmail}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({
         name,
         email,
         message,
-        _subject: `Nuevo contacto desde portfolio - ${name}`,
-        _template: "table",
+        _subject: `Nuevo mensaje de ${name} via Portfolio`,
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.text().catch(() => "");
-      throw new Error(`FormSubmit devolvió ${response.status}${errorData ? `: ${errorData}` : ""}`);
+    if (response.ok) {
+      res.status(200).json({ ok: true });
+    } else {
+      const errorText = await response.text();
+      console.error("FormSubmit error:", errorText);
+      res.status(500).json({ error: "No se pudo enviar el mensaje. Inténtalo de nuevo más tarde." });
     }
-
-    res.json({ ok: true });
   } catch (error) {
-    console.error("Contact API error:", error instanceof Error ? error.message : error);
-    res.status(502).json({
-      error: "No se pudo enviar el formulario en este momento.",
-    });
+    console.error("Contact API error:", error);
+    res.status(500).json({ error: "Ocurrió un error inesperado al enviar el mensaje." });
   }
 });
 

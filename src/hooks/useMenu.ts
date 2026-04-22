@@ -34,6 +34,15 @@ export function useMenu(onItemClick?: () => void): UseMenuReturn {
     (item: MenuAction) => {
       if (item.action) {
         item.action();
+      } else if (item.href) {
+        if (item.href.startsWith("#")) {
+          const element = document.querySelector(item.href);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          window.location.href = item.href;
+        }
       }
       close();
       onItemClick?.();

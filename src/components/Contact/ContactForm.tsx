@@ -1,14 +1,10 @@
-import React, { type ReactNode } from "react";
+import React from "react";
 import { Send, User, Mail, MessageSquare } from "lucide-react";
 import { useContactForm } from "../../hooks/useContactForm";
 
 interface ContactFormProps {
   onSuccess?: () => void;
 }
-
-const getPublicContactEmail = () => {
-  return import.meta.env.VITE_PUBLIC_CONTACT_EMAIL || "";
-};
 
 export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
   const {
@@ -19,33 +15,9 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
     handleSubmit,
   } = useContactForm(onSuccess);
 
-  const publicContactEmail = getPublicContactEmail();
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-center text-sm">
-      <p className="text-xs bg-accent/20 text-accent font-medium px-3 py-1 rounded-full mb-2">
-        Contáctame
-      </p>
-      <h1 className="text-3xl md:text-4xl font-bold py-2 text-center text-white">
-        Estemos en contacto.
-      </h1>
-      {publicContactEmail ? (
-        <p className="max-md:text-sm text-gray-500 pb-6 text-center">
-          O simplemente escríbeme a{" "}
-          <a
-            href={`mailto:${publicContactEmail}`}
-            className="text-accent hover:underline"
-          >
-            {publicContactEmail}
-          </a>
-        </p>
-      ) : (
-        <p className="max-md:text-sm text-gray-500 pb-6 text-center">
-          Tu mensaje se envía de forma segura desde el formulario.
-        </p>
-      )}
-
-      <div className="max-w-96 w-full px-2">
+    <form onSubmit={handleSubmit} className="flex flex-col items-center text-sm w-full">
+      <div className="w-full">
         {/* Name Field */}
         <label htmlFor="name" className="font-medium text-gray-300">
           Nombre completo
@@ -70,7 +42,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
           />
         </div>
         {errors.name && (
-          <p className="text-red-500 text-xs mb-2">{errors.name}</p>
+          <p className="text-red-500 text-xs mb-2 pl-4">{errors.name}</p>
         )}
 
         {/* Email Field */}
@@ -97,7 +69,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
           />
         </div>
         {errors.email && (
-          <p className="text-red-500 text-xs mb-2">{errors.email}</p>
+          <p className="text-red-500 text-xs mb-2 pl-4">{errors.email}</p>
         )}
 
         {/* Message Field */}
@@ -124,28 +96,26 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSuccess }) => {
           ></textarea>
         </div>
         {errors.message && (
-          <p className="text-red-500 text-xs mb-2">{errors.message}</p>
+          <p className="text-red-500 text-xs mb-2 pl-4">{errors.message}</p>
         )}
 
         {/* Submit Error */}
         {errors.submit && (
-          <p className="text-red-500 text-xs mb-2">{errors.submit}</p>
+          <p className="text-red-500 text-xs mb-2 pl-4 font-medium">{errors.submit}</p>
         )}
 
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={formStatus === "sending"}
-          className="flex items-center justify-center gap-2 mt-4 bg-accent text-black font-bold py-3 px-8 rounded-full hover:scale-[1.02] transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-full"
+          disabled={formStatus === "sending" || formStatus === "sent"}
+          className="flex items-center justify-center gap-2 mt-4 bg-accent text-black font-bold py-4 px-8 rounded-full hover:scale-[1.01] transition-transform disabled:opacity-50 disabled:cursor-not-allowed w-full shadow-lg shadow-accent/20"
         >
           {formStatus === "sending"
             ? "Enviando..."
             : formStatus === "sent"
-              ? "¡Enviado!"
+              ? "¡Mensaje enviado con éxito!"
               : "Enviar mensaje"}
-          {formStatus !== "sending" && formStatus !== "sent" && (
-            <Send className="w-5 h-5" />
-          )}
+          {formStatus === "idle" && <Send className="w-5 h-5" />}
         </button>
       </div>
     </form>

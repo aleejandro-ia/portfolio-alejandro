@@ -19,7 +19,7 @@ export const Navigation: React.FC<NavigationProps> = ({ items, onItemSelect }) =
   const { isOpen, menuRef, buttonRef, toggle, handleItemClick } = useMenu(onItemSelect);
 
   return (
-    <div className="relative">
+    <div ref={menuRef} className="relative">
       <button
         ref={buttonRef}
         type="button"
@@ -36,7 +36,6 @@ export const Navigation: React.FC<NavigationProps> = ({ items, onItemSelect }) =
 
       {isOpen && (
         <div
-          ref={menuRef}
           className="absolute top-full left-0 w-[200px] md:w-[240px] border-none shadow-2xl mt-2 ml-4 p-4 rounded-lg z-[100] bg-black"
         >
           {items.map((item) => (
