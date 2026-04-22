@@ -245,12 +245,18 @@ async function start() {
     });
   }
 
-  app.listen(port, () => {
-    console.log(`Portfolio server running on http://localhost:${port}`);
+  if (!process.env.VERCEL) {
+    app.listen(port, () => {
+      console.log(`Portfolio server running on http://localhost:${port}`);
+    });
+  }
+}
+
+if (!process.env.VERCEL) {
+  start().catch((error) => {
+    console.error("Failed to start the portfolio server:", error);
+    process.exit(1);
   });
 }
 
-start().catch((error) => {
-  console.error("Failed to start the portfolio server:", error);
-  process.exit(1);
-});
+export default app;
