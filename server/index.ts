@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { Message } from "../src/components/NexusDemo/types";
-import { validateContactForm } from "../src/utils/validation";
-import { hasGeminiConfig, triageConversationWithGemini } from "./geminiTriage";
+import { validateContactForm } from "./contactValidation.js";
+import { hasGeminiConfig, triageConversationWithGemini } from "./geminiTriage.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
