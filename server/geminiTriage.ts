@@ -1,10 +1,11 @@
 import type { Message, TriageResponse } from "../src/components/NexusDemo/types";
 
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const MAX_RETRIES = 3;
-const BASE_DELAY_MS = 1500;
+const MAX_RETRIES = process.env.VERCEL ? 1 : 2;
+const BASE_DELAY_MS = 750;
 const MAX_MESSAGES = 12;
 const MAX_MESSAGE_LENGTH = 2000;
+const REQUEST_TIMEOUT_MS = 8000;
 
 const SYSTEM_INSTRUCTION = `
 # ROL Y CONTEXTO
@@ -118,6 +119,18 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+function shouldRetryNetworkError(error: unknown): boolean {
+  return isAbortError(error) || error instanceof TypeError;
+}
+
+function stripMarkdownCodeFence(content: string): string {
+  return content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+}
+
 function sanitizeMessages(messages: Message[]) {
   // 1. Find the first user message (Gemini requires starting with 'user')
   const firstUserIndex = messages.findIndex((m) => m.role === "user");
@@ -225,33 +238,42 @@ export async function triageConversationWithGemini(
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${options.apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: SYSTEM_INSTRUCTION }],
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      let response: globalThis.Response;
+
+      try {
+        response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${options.apiKey}`,
+          {
+            method: "POST",
+            signal: controller.signal,
+            headers: {
+              "Content-Type": "application/json",
             },
-            contents: conversationHistory,
-            generationConfig: {
-              temperature: 0.1,
-              topK: 1,
-              topP: 1,
-              maxOutputTokens: 2048,
-              responseMimeType: "application/json",
-            },
-          }),
-        }
-      );
+            body: JSON.stringify({
+              systemInstruction: {
+                parts: [{ text: SYSTEM_INSTRUCTION }],
+              },
+              contents: conversationHistory,
+              generationConfig: {
+                temperature: 0.1,
+                topK: 1,
+                topP: 1,
+                maxOutputTokens: 2048,
+                responseMimeType: "application/json",
+              },
+            }),
+          }
+        );
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
 
-        if (response.status === 429 && attempt < MAX_RETRIES) {
+        if ((response.status === 429 || response.status >= 500) && attempt < MAX_RETRIES) {
           await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1));
           continue;
         }
@@ -266,18 +288,30 @@ export async function triageConversationWithGemini(
       }
 
       const data = await response.json();
-      const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const candidate = data?.candidates?.[0];
+      const content = candidate?.content?.parts
+        ?.map((part: { text?: string }) => part?.text || "")
+        .join("")
+        .trim();
 
       if (!content) {
-        throw new Error("Gemini no devolvió contenido.");
+        const finishReason = candidate?.finishReason || data?.promptFeedback?.blockReason;
+        throw new Error(
+          finishReason
+            ? `Gemini no devolvió contenido procesable (${finishReason}).`
+            : "Gemini no devolvió contenido."
+        );
       }
 
-      const parsed = JSON.parse(content) as Partial<TriageResponse>;
+      const parsed = JSON.parse(stripMarkdownCodeFence(content)) as Partial<TriageResponse>;
       return validateAndCompleteResponse(parsed);
     } catch (error) {
-      if (attempt === MAX_RETRIES) {
-        return getErrorResponse(error);
+      if (attempt < MAX_RETRIES && shouldRetryNetworkError(error)) {
+        await delay(BASE_DELAY_MS * Math.pow(2, attempt - 1));
+        continue;
       }
+
+      return getErrorResponse(error);
     }
   }
 

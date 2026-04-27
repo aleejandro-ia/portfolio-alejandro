@@ -1,5 +1,4 @@
 import express, { type NextFunction, type Request, type Response } from "express";
-// Vite imports will be dynamic to prevent serverless function crash
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,18 +13,6 @@ const rootDir = path.resolve(__dirname, "..");
 const distDir = path.join(rootDir, "dist");
 const isProduction = process.argv.includes("--prod") || process.env.NODE_ENV === "production" || !!process.env.VERCEL;
 const mode = isProduction ? "production" : "development";
-
-// Load local environment variables only in development
-if (!isProduction) {
-  import("vite").then(({ loadEnv }) => {
-    const env = loadEnv(mode, rootDir, "");
-    for (const [key, value] of Object.entries(env)) {
-      if (!process.env[key]) {
-        process.env[key] = value as string;
-      }
-    }
-  }).catch(console.error);
-}
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -96,18 +83,41 @@ function getEnvValue(...keys: string[]): string {
   return "";
 }
 
+async function loadDevelopmentEnv(): Promise<void> {
+  if (isProduction) {
+    return;
+  }
+
+  const { loadEnv } = await import("vite");
+  const env = loadEnv(mode, rootDir, "");
+
+  for (const [key, value] of Object.entries(env)) {
+    if (!process.env[key]) {
+      process.env[key] = value as string;
+    }
+  }
+}
+
+function getGeminiApiKey(): string {
+  return getEnvValue("GEMINI_API_KEY", "GOOGLE_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY");
+}
+
+function getGeminiModel(): string {
+  return getEnvValue("GEMINI_MODEL", "GOOGLE_GENERATIVE_AI_MODEL") || "gemini-2.5-flash";
+}
+
 const contactLimiter = createRateLimiter(15 * 60 * 1000, 5);
 const triageLimiter = createRateLimiter(5 * 60 * 1000, 30);
 
 app.get("/api/triage/health", (_req, res) => {
-  const apiKey = getEnvValue("GEMINI_API_KEY");
+  const apiKey = getGeminiApiKey();
   res.setHeader("Cache-Control", "no-store");
   res.json({ ok: hasGeminiConfig(apiKey) });
 });
 
 app.post("/api/triage", triageLimiter, async (req, res) => {
-  const apiKey = getEnvValue("GEMINI_API_KEY");
-  const model = getEnvValue("GEMINI_MODEL") || "gemini-2.5-flash";
+  const apiKey = getGeminiApiKey();
+  const model = getGeminiModel();
   const { messages } = req.body as { messages?: Message[] };
 
   res.setHeader("Cache-Control", "no-store");
@@ -215,7 +225,37 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   }
 });
 
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (!req.path.startsWith("/api/")) {
+    next(error);
+    return;
+  }
+
+  const requestError = error as { message?: string; status?: number; type?: string };
+
+  if (requestError.type === "entity.too.large") {
+    res.status(413).json({
+      error: "La conversación es demasiado larga para procesarla. Reinicia el chat o envía menos contexto.",
+    });
+    return;
+  }
+
+  if (error instanceof SyntaxError && "body" in error) {
+    res.status(400).json({
+      error: "La solicitud enviada al servidor no tiene un formato JSON válido.",
+    });
+    return;
+  }
+
+  console.error("API middleware error:", requestError.message || error);
+  res.status(requestError.status && requestError.status >= 400 ? requestError.status : 500).json({
+    error: "El servidor no pudo completar la solicitud de Nexus.",
+  });
+});
+
 async function start() {
+  await loadDevelopmentEnv();
+
   if (!isProduction) {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
