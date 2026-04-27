@@ -4,9 +4,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { Message } from "../src/components/NexusDemo/types.ts";
-import { validateContactForm } from "../src/utils/validation.ts";
-import { hasGeminiConfig, triageConversationWithGemini } from "./geminiTriage.ts";
+import type { Message } from "../src/components/NexusDemo/types";
+import { validateContactForm } from "../src/utils/validation";
+import { hasGeminiConfig, triageConversationWithGemini } from "./geminiTriage";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

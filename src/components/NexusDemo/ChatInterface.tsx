@@ -125,10 +125,11 @@ export default function ChatInterface({
     } catch (error) {
       console.error("Chat Error:", error);
       setIsTyping(false);
+      const errorMsg = error instanceof Error ? error.message : 'Lo siento, ha habido un problema técnico. Por favor, inténtelo de nuevo.';
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Lo siento, ha habido un problema técnico. Por favor, inténtelo de nuevo.',
+        content: errorMsg,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

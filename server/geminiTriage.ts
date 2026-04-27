@@ -1,4 +1,4 @@
-import type { Message, TriageResponse } from "../src/components/NexusDemo/types.ts";
+import type { Message, TriageResponse } from "../src/components/NexusDemo/types";
 
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const MAX_RETRIES = 3;
