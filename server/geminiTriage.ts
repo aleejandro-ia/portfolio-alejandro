@@ -119,8 +119,39 @@ function delay(ms: number): Promise<void> {
 }
 
 function sanitizeMessages(messages: Message[]) {
-  return messages.slice(-MAX_MESSAGES).map((message) => ({
-    role: message.role === "user" ? "user" : "model",
+  // 1. Find the first user message (Gemini requires starting with 'user')
+  const firstUserIndex = messages.findIndex((m) => m.role === "user");
+  if (firstUserIndex === -1) {
+    // If there are no user messages, provide a dummy one to avoid API errors
+    return [{
+      role: "user",
+      parts: [{ text: "Hola" }]
+    }];
+  }
+
+  const validMessages = messages.slice(firstUserIndex);
+
+  // 2. Enforce alternating roles by grouping consecutive messages
+  const alternatingMessages: { role: string; content: string }[] = [];
+  
+  for (const msg of validMessages) {
+    const role = msg.role === "user" ? "user" : "model";
+    
+    if (alternatingMessages.length === 0) {
+      alternatingMessages.push({ role, content: msg.content });
+    } else {
+      const lastMsg = alternatingMessages[alternatingMessages.length - 1];
+      if (lastMsg.role === role) {
+        // Group consecutive messages of the same role
+        lastMsg.content += `\n${msg.content}`;
+      } else {
+        alternatingMessages.push({ role, content: msg.content });
+      }
+    }
+  }
+
+  return alternatingMessages.slice(-MAX_MESSAGES).map((message) => ({
+    role: message.role,
     parts: [
       {
         text: message.content.trim().slice(0, MAX_MESSAGE_LENGTH),
