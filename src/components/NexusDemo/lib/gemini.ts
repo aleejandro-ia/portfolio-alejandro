@@ -12,9 +12,19 @@ export async function triageConversation(messages: Message[]): Promise<TriageRes
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(
-      errorData?.error || "No se pudo procesar el triaje en este momento."
-    );
+    let errorMessage = "No se pudo procesar el triaje en este momento.";
+    if (errorData) {
+      if (typeof errorData.error === "string") {
+        errorMessage = errorData.error;
+      } else if (errorData.error && typeof errorData.error.message === "string") {
+        errorMessage = errorData.error.message;
+      } else if (errorData.message) {
+        errorMessage = errorData.message;
+      } else {
+        errorMessage = JSON.stringify(errorData);
+      }
+    }
+    throw new Error(errorMessage);
   }
 
   return response.json();

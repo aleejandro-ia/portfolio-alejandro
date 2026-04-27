@@ -1,5 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from "express";
-import { loadEnv, createServer as createViteServer } from "vite";
+// Vite imports will be dynamic to prevent serverless function crash
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,14 +12,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const distDir = path.join(rootDir, "dist");
-const isProduction = process.argv.includes("--prod") || process.env.NODE_ENV === "production";
+const isProduction = process.argv.includes("--prod") || process.env.NODE_ENV === "production" || !!process.env.VERCEL;
 const mode = isProduction ? "production" : "development";
-const env = loadEnv(mode, rootDir, "");
 
-for (const [key, value] of Object.entries(env)) {
-  if (!process.env[key]) {
-    process.env[key] = value;
-  }
+// Load local environment variables only in development
+if (!isProduction) {
+  import("vite").then(({ loadEnv }) => {
+    const env = loadEnv(mode, rootDir, "");
+    for (const [key, value] of Object.entries(env)) {
+      if (!process.env[key]) {
+        process.env[key] = value as string;
+      }
+    }
+  }).catch(console.error);
 }
 
 const app = express();
@@ -212,6 +217,7 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
 
 async function start() {
   if (!isProduction) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       root: rootDir,
       server: {
