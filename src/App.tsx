@@ -15,6 +15,7 @@ import {
   Rocket,
   ArrowRight,
 } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 import { IntroAnimation } from "./components/Animations/IntroAnimation";
 import { ShaderAnimation } from "./components/Animations/ShaderAnimation";
 import { BlurText } from "./components/Hero/BlurText";
@@ -503,6 +504,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      <Analytics />
     </div>
   );
 }
