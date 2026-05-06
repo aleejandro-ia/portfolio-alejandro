@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, Loader2, CheckCircle2, AlertCircle, Trash2, Cpu, User } from 'lucide-react';
+import { Send, Loader2, CheckCircle2, Trash2, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { ScrollArea } from '../ui/scroll-area';
@@ -21,7 +21,6 @@ interface ChatInterfaceProps {
   setCurrentTriage: (triage: TriageResponse | null) => void;
   onTicketCreated: (ticket: StructuredTicket) => void;
   onNewChat: () => void;
-  onClose: () => void;
 }
 
 export default function ChatInterface({
@@ -34,8 +33,7 @@ export default function ChatInterface({
   currentTriage,
   setCurrentTriage,
   onTicketCreated,
-  onNewChat,
-  onClose
+  onNewChat
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -217,7 +215,7 @@ export default function ChatInterface({
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-start px-2 w-full">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-6 h-6 rounded-full bg-[#8FE331]/20 flex items-center justify-center border border-[#8FE331]/30 shrink-0 overflow-hidden">
-                        <img src="/nexus-logo-transparent.png" alt="Nexus Logo" className="w-4 h-4 object-contain" />
+                        <img src="/nexus-logo-transparente.png" alt="Nexus Logo" className="w-4 h-4 object-contain" />
                       </div>
                       <span className="text-xs font-semibold text-white">Nexus AI</span>
                     </div>
@@ -274,7 +272,7 @@ export default function ChatInterface({
                     Reiniciar conversación
                   </button>
                   <Button onClick={handleSend} disabled={!input.trim() || isTyping} className="h-10 px-6 bg-[#8FE331] text-[#12161E] text-xs font-bold hover:bg-[#9DEB40] transition-colors disabled:opacity-50 rounded-xl gap-2 shadow-sm">
-                    Envíar <Send size={14} />
+                    Enviar <Send size={14} />
                   </Button>
                 </div>
               </div>

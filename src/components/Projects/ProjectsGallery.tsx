@@ -9,7 +9,7 @@ import {
 } from "motion/react";
 import { Project } from "../../data/projects";
 import { ArrowRight } from "lucide-react";
-import { NexusDemoTrigger } from "../NexusDemo";
+import NexusDemoTrigger from "../NexusDemo/NexusDemoTrigger";
 
 // Wrapper function mapped to prevent JS negative modulo bugs format
 const wrap = (min: number, max: number, v: number) => {

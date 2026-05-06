@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Search, Clock, MessageSquare, Package, Bot,
-  Home, Grid, Folder, Star, Settings, LogOut, User, Sparkles, FileText, CheckSquare, ChevronDown, ListTodo, AlertTriangle, CheckCircle2
+  Search, Clock, MessageSquare, Package,
+  Home, Grid, Folder, Star, Settings, LogOut, User, Sparkles, FileText, ChevronDown, ListTodo, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';

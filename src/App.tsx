@@ -1,18 +1,11 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { Suspense, lazy, useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import {
   Mail,
-  ExternalLink,
   ChevronDown,
   X,
   Database,
   Search,
-  Rocket,
   ArrowRight,
 } from "lucide-react";
 import { IntroAnimation } from "./components/Animations/IntroAnimation";
@@ -26,8 +19,9 @@ import { COLORS, FONTS } from "./constants";
 import { projects } from "./data/projects";
 import { parallaxImages } from "./data/parallax";
 import { useClickOutside } from "./hooks/useClickOutside";
-import { NexusDemoModal } from "./components/NexusDemo";
 import { ProjectsGallery } from "./components/Projects/ProjectsGallery";
+
+const NexusDemoModal = lazy(() => import("./components/NexusDemo/NexusDemoModal"));
 
 const getPublicContactEmail = () => {
   return import.meta.env.VITE_PUBLIC_CONTACT_EMAIL || "";
@@ -139,9 +133,6 @@ export default function App() {
       {/* Hero Section */}
       <main className={`relative min-h-screen flex flex-col transition-opacity duration-1000 ${introComplete ? 'opacity-100' : 'opacity-0'}`}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-2 sm:px-4 flex items-center justify-center">
-
-
-
           <div className="relative text-center z-10 max-w-full">
             <div className="flex flex-col items-center">
               <BlurText
@@ -394,7 +385,11 @@ export default function App() {
       </section>
 
       {/* Nexus Demo Modal */}
-      <NexusDemoModal isOpen={showNexusDemo} onClose={() => setShowNexusDemo(false)} />
+      {showNexusDemo && (
+        <Suspense fallback={null}>
+          <NexusDemoModal isOpen={showNexusDemo} onClose={() => setShowNexusDemo(false)} />
+        </Suspense>
+      )}
 
       {/* Contact Modal */}
       {showContactModal && (

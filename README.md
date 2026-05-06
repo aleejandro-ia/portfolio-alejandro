@@ -4,7 +4,7 @@
 
 # Alejandro Lopez Portfolio
 
-Portfolio profesional de Alejandro Lopez, centrado en automatizacion, IA aplicada y la demo interactiva de Nexus.
+Portfolio profesional de Alejandro Lopez, centrado en automatización, IA aplicada y la demo interactiva de Nexus.
 
 ## Stack
 
@@ -17,15 +17,15 @@ Portfolio profesional de Alejandro Lopez, centrado en automatizacion, IA aplicad
 
 ## Desarrollo local
 
-**Prerequisitos:** Node.js 20+
+**Prerrequisitos:** Node.js 20+
 
-1. Install dependencies:
+1. Instala dependencias:
    `npm install`
 2. Crea `.env.local` a partir de [.env.example](.env.example)
 3. Configura las variables del servidor:
    `GEMINI_API_KEY`
    `CONTACT_EMAIL`
-4. Opcionalmente, si quieres mostrar un correo publico en la UI:
+4. Opcionalmente, si quieres mostrar un correo público en la UI:
    `VITE_PUBLIC_CONTACT_EMAIL`
 5. Ejecuta el proyecto:
    `npm run dev`
@@ -33,10 +33,10 @@ Portfolio profesional de Alejandro Lopez, centrado en automatizacion, IA aplicad
 ## Seguridad
 
 - Gemini ya no se llama desde el frontend: el triaje pasa por `/api/triage`
-- El formulario ya no expone el destinatario en cliente: el envio pasa por `/api/contact`
+- El formulario ya no expone el destinatario en cliente: el envío pasa por `/api/contact`
 - Los secretos deben vivir en `.env.local`, no en variables `VITE_*`
 
-## Produccion
+## Producción
 
 1. Build:
    `npm run build`
