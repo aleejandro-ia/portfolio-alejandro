@@ -8,6 +8,7 @@ export function ShaderAnimation() {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let renderer: THREE.WebGLRenderer | null = null;
     let animationId: number | null = null;
     let geometry: THREE.PlaneGeometry | null = null;
@@ -32,7 +33,7 @@ export function ShaderAnimation() {
         void main(void) {
           vec2 uv = (gl_FragCoord.xy * 2.0 - resolution.xy) / min(resolution.x, resolution.y);
           float t = time*0.05;
-          float lineWidth = 0.002;
+          float lineWidth = 0.0022;
 
           vec3 color = vec3(0.0);
           for(int j = 0; j < 3; j++){
@@ -41,8 +42,8 @@ export function ShaderAnimation() {
               color[j] += lineWidth*float(i*i) / (dist + 0.001);
             }
           }
-          
-          gl_FragColor = vec4(color[0],color[1],color[2],1.0);
+
+          gl_FragColor = vec4(color[0], color[1], color[2], 1.0);
         }
       `;
 
@@ -64,12 +65,19 @@ export function ShaderAnimation() {
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
-      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
+      renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        alpha: true,
+        powerPreference: "low-power",
+      });
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
-      renderer.setClearColor(0x000000, 1);
+      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5));
+      renderer.setClearColor(0x000000, 0);
 
       container.appendChild(renderer.domElement);
+      renderer.domElement.style.width = "100%";
+      renderer.domElement.style.height = "100%";
+      renderer.domElement.style.display = "block";
 
       const onWindowResize = () => {
         if (!container || !renderer) return;
@@ -84,8 +92,7 @@ export function ShaderAnimation() {
           renderer!.setSize(width, height);
           
           const pixelRatio = renderer!.getPixelRatio();
-          // Lower resolution multiplier for mobile to save GPU
-          const resMultiplier = isMobile ? 0.5 : 1.0;
+          const resMultiplier = isMobile ? 0.65 : 0.9;
           
           uniforms.resolution.value.x = width * pixelRatio * resMultiplier;
           uniforms.resolution.value.y = height * pixelRatio * resMultiplier;
@@ -97,7 +104,7 @@ export function ShaderAnimation() {
 
       const animate = () => {
         animationId = requestAnimationFrame(animate);
-        uniforms.time.value += 0.05;
+        uniforms.time.value += prefersReducedMotion ? 0.006 : 0.035;
         if (renderer) renderer.render(scene, camera);
       };
 
@@ -129,11 +136,12 @@ export function ShaderAnimation() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 w-full h-full -z-10"
+      className="pointer-events-none fixed inset-0 z-0 h-screen w-screen opacity-40 sm:opacity-45"
       style={{
-        background: "#000",
+        background: "transparent",
         overflow: "hidden",
       }}
+      aria-hidden="true"
     />
   );
 }
