@@ -3,16 +3,12 @@ import { motion } from "motion/react";
 import {
   ArrowRight,
   Bot,
-  Boxes,
-  BrainCircuit,
-  CheckCircle2,
   ChevronDown,
   Database,
   GitBranch,
   Hammer,
   Mail,
   Puzzle,
-  Search,
   Sparkles,
   Workflow,
   X,
@@ -25,6 +21,7 @@ import { COLORS, FONTS } from "./constants";
 import { projects } from "./data/projects";
 import { useClickOutside } from "./hooks/useClickOutside";
 import { ProjectsGallery } from "./components/Projects/ProjectsGallery";
+import { BuildProcessSection } from "./components/Process/BuildProcessSection";
 
 const NexusDemoModal = lazy(() => import("./components/NexusDemo/NexusDemoModal"));
 
@@ -86,79 +83,6 @@ const SERVICES = [
     title: "Flujos y operaciones",
     description:
       "Estructuro operaciones y recorridos de trabajo para que los sistemas sean más claros, medibles y escalables.",
-  },
-];
-
-const PROCESS_STEPS = [
-  {
-    id: "01",
-    icon: Search,
-    title: "Diagnóstico",
-    description:
-      "Analizo procesos, tareas repetitivas y cuellos de botella para detectar oportunidades reales de automatización y mejora.",
-  },
-  {
-    id: "02",
-    icon: BrainCircuit,
-    title: "Diseño",
-    description:
-      "Defino el flujo, la lógica y el papel de la IA para construir una solución útil, clara y alineada con negocio.",
-  },
-  {
-    id: "03",
-    icon: Hammer,
-    title: "Prototipo",
-    description:
-      "Creo una primera versión funcional para validar la idea, probar su valor y acelerar mejores decisiones.",
-  },
-  {
-    id: "04",
-    icon: CheckCircle2,
-    title: "Iteración e implementación",
-    description:
-      "Ajusto, conecto y preparo la solución para su uso real, priorizando eficiencia, claridad y escalabilidad.",
-  },
-];
-
-const TOOL_GROUPS = [
-  {
-    icon: BrainCircuit,
-    title: "IA aplicada y automatización",
-    description:
-      "Aplico IA, automatización y agentes para transformar procesos manuales en sistemas más rápidos, claros y útiles.",
-    items: [
-      "OpenAI",
-      "Gemini",
-      "Make",
-      "n8n",
-      "agentes de IA",
-    ],
-  },
-  {
-    icon: Boxes,
-    title: "Prototipado y construcción",
-    description:
-      "Paso de idea a demo funcional con prototipado rápido, validación iterativa y construcción asistida por IA.",
-    items: [
-      "prototipado rápido",
-      "demos funcionales",
-      "validación",
-      "integración",
-    ],
-  },
-  {
-    icon: Database,
-    title: "Herramientas de trabajo",
-    description:
-      "Trabajo con un entorno flexible para diseñar, construir, desplegar y mejorar soluciones de forma ágil.",
-    items: [
-      "Codex",
-      "Claude",
-      "ChatGPT",
-      "GitHub",
-      "Vercel",
-      "Firebase",
-    ],
   },
 ];
 
@@ -467,179 +391,7 @@ export default function App() {
           <ProjectsGallery projects={projects} setShowNexusDemo={setShowNexusDemo} />
         </section>
 
-        <section id="proceso" className="relative z-10 overflow-hidden py-16 sm:py-24 md:py-28">
-          <span id="herramientas" className="absolute -top-24" aria-hidden="true" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/75 to-transparent" />
-          <div className="pointer-events-none absolute right-[-5rem] top-6 hidden h-[29rem] w-[29rem] rounded-full border border-accent/8 lg:block">
-            <div className="absolute inset-10 rounded-full border border-accent/10" />
-            <div className="absolute inset-20 rounded-full border border-accent/12" />
-            <div className="absolute inset-32 rounded-full border border-accent/18" />
-            <div className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.85),0_0_48px_rgba(212,255,0,0.85)]" />
-            <div className="absolute left-1/2 top-1/2 h-28 w-px -translate-x-1/2 bg-gradient-to-b from-accent to-accent/0 shadow-[0_0_18px_rgba(212,255,0,0.75)]" />
-          </div>
-
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={fadeUp}
-              transition={{ duration: 0.6 }}
-              className="max-w-5xl"
-            >
-              <div className="flex items-center gap-4">
-                <p className="text-xs font-mono uppercase tracking-[0.32em] text-accent">
-                  CÓMO CONSTRUYO
-                </p>
-                <div className="hidden h-px w-24 bg-gradient-to-r from-accent to-accent/0 sm:block" />
-                <div className="hidden h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_12px_rgba(212,255,0,0.7)] sm:block" />
-              </div>
-
-              <h2 className="mt-6 max-w-4xl text-4xl font-extrabold leading-[1.06] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[4.5rem]">
-                De la idea al prototipo: método, herramientas y criterio para
-                construir soluciones con IA que se pueden validar
-                <span className="text-accent">.</span>
-              </h2>
-
-              <p className="mt-6 max-w-3xl text-base leading-relaxed text-gray-300 sm:text-lg">
-                Trabajo con un enfoque práctico: analizo procesos, detecto
-                oportunidades, diseño automatizaciones y construyo prototipos
-                funcionales con IA para validar ideas, optimizar operaciones y
-                convertir necesidades reales en soluciones utilizables.
-              </p>
-            </motion.div>
-
-            <div className="relative mt-12 min-h-[27rem] sm:mt-16 lg:mt-0">
-              <svg
-                className="pointer-events-none absolute right-[8%] top-[-7.5rem] hidden h-[30rem] w-[58%] overflow-visible lg:block"
-                viewBox="0 0 760 430"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M12 356H102C146 356 172 330 172 286V246C172 202 198 176 242 176H456C506 176 532 150 532 100V54C532 27 552 8 579 8H702"
-                  stroke="rgba(212,255,0,0.08)"
-                  strokeWidth="44"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M12 356H102C146 356 172 330 172 286V246C172 202 198 176 242 176H456C506 176 532 150 532 100V54C532 27 552 8 579 8H702"
-                  stroke="rgba(212,255,0,0.22)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M12 356H102C146 356 172 330 172 286V246C172 202 198 176 242 176H456C506 176 532 150 532 100V54C532 27 552 8 579 8H702"
-                  stroke="url(#processGlow)"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-                <circle cx="12" cy="356" r="3" fill="#d4ff00" />
-                <circle cx="702" cy="8" r="5" fill="#d4ff00" />
-                <defs>
-                  <linearGradient id="processGlow" x1="0" y1="360" x2="720" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#d4ff00" stopOpacity="0" />
-                    <stop offset="0.45" stopColor="#d4ff00" stopOpacity="0.92" />
-                    <stop offset="1" stopColor="#d4ff00" stopOpacity="0.68" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="pointer-events-none absolute left-8 top-4 bottom-4 w-px bg-gradient-to-b from-accent/0 via-accent/35 to-accent/0 lg:hidden" />
-
-              <div className="relative grid gap-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:grid-cols-4 lg:gap-16">
-                {PROCESS_STEPS.map((step, index) => {
-                  const Icon = step.icon;
-                  return (
-                    <motion.article
-                      key={step.id}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true, margin: "-80px" }}
-                      variants={fadeUp}
-                      transition={{ duration: 0.55, delay: index * 0.07 }}
-                      className="relative min-h-[14.5rem] overflow-hidden rounded-[18px] border border-accent/25 bg-black/55 p-5 shadow-[0_0_28px_rgba(212,255,0,0.07)] backdrop-blur-md sm:p-6 lg:min-h-[15.5rem]"
-                    >
-                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(212,255,0,0.12),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.06),transparent_45%)]" />
-                      <div className="pointer-events-none absolute inset-0 rounded-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" />
-                      {index < PROCESS_STEPS.length - 1 && (
-                        <div className="absolute -right-10 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-accent/45 bg-black text-accent shadow-[0_0_20px_rgba(212,255,0,0.35)] lg:flex">
-                          <ArrowRight className="h-4 w-4" />
-                        </div>
-                      )}
-
-                      <div className="relative flex items-start gap-6">
-                        <p className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-accent/45 bg-accent/8 font-mono text-base text-accent">
-                          {step.id}
-                        </p>
-                        <Icon className="mt-2 h-9 w-9 text-accent drop-shadow-[0_0_14px_rgba(212,255,0,0.55)]" />
-                      </div>
-
-                      <h3 className="relative mt-7 text-2xl font-bold leading-tight text-white">
-                        {step.title}
-                      </h3>
-                      <p className="relative mt-3 text-base leading-relaxed text-gray-300">
-                        {step.description}
-                      </p>
-                    </motion.article>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-10 sm:mt-14">
-              <div className="flex items-center gap-4">
-                <p className="text-xs font-mono uppercase tracking-[0.32em] text-accent">
-                  ENTORNO CON EL QUE CONSTRUYO
-                </p>
-                <div className="h-px flex-1 bg-gradient-to-r from-accent/45 to-accent/0" />
-              </div>
-
-              <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                {TOOL_GROUPS.map((group, index) => {
-                  const Icon = group.icon;
-                  return (
-                    <motion.article
-                      key={group.title}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true, margin: "-80px" }}
-                      variants={fadeUp}
-                      transition={{ duration: 0.55, delay: index * 0.08 }}
-                      className="relative overflow-hidden rounded-[18px] border border-white/12 bg-white/[0.045] p-5 shadow-[0_0_24px_rgba(0,0,0,0.22)] backdrop-blur-md sm:p-6"
-                    >
-                      <div className="pointer-events-none absolute right-0 top-0 h-28 w-32 bg-gradient-to-bl from-white/10 via-accent/8 to-transparent" />
-                      <div className="pointer-events-none absolute inset-0 rounded-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" />
-                      <div className="relative flex items-start gap-4">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-accent/35 bg-accent/10 text-accent shadow-[0_0_18px_rgba(212,255,0,0.12)]">
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold leading-tight text-white sm:text-2xl">
-                            {group.title}
-                          </h3>
-                          <p className="mt-3 text-sm leading-relaxed text-gray-400">
-                            {group.description}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="relative mt-5 flex flex-wrap gap-2">
-                        {group.items.map((item) => (
-                          <span
-                            key={item}
-                            className="rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-gray-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:text-sm"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </motion.article>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
+        <BuildProcessSection />
 
         <SectionShell
           id="sobre-mi"
